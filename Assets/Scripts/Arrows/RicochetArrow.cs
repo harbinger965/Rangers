@@ -4,7 +4,7 @@ namespace Assets.Scripts.Arrows
     public class RicochetArrow : ArrowProperty
     {
         /// <summary>
-        /// Number of bounce an arrow can bounce before stopping
+        /// Number of bounces an arrow can undergo before stopping
         /// </summary>
         public static int bounces = 4;
 

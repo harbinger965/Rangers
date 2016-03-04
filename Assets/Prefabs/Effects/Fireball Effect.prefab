@@ -29,7 +29,7 @@ GameObject:
   - 135: {fileID: 13545202}
   m_Layer: 12
   m_Name: Fireball Effect
-  m_TagString: Untagged
+  m_TagString: Effect
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doNotActivate:
     serializedVersion: 2
-    m_Bits: 4294965759
+    m_Bits: 4294949375
 --- !u!135 &13545202
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -6227,6 +6227,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Layer
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: doNotActivate.m_Bits
+      value: 4294949375
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_TagString
+      value: Effect
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

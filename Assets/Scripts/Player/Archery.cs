@@ -43,9 +43,10 @@ namespace Assets.Scripts.Player
         // Fires an arrow
         public void Fire()
         {
-			GameObject arrow = (GameObject)Instantiate(arrowPrefab, firePoint.position + (Vector3.up*0.5f), firePoint.rotation);
-			arrow.GetComponent<Rigidbody>().AddRelativeForce((firePoint.position - bowPosition.position) * 20 * (strength+0.1f), ForceMode.Impulse);
+			GameObject arrow = (GameObject)Instantiate(arrowPrefab, bowPosition.position + (firePoint.position - bowPosition.position)/2f, firePoint.rotation);
+			arrow.GetComponent<Rigidbody>().AddRelativeForce((firePoint.position - (bowPosition.position+Vector3.up*0.1f)) * 20 * (strength+0.1f), ForceMode.Impulse);
             arrow.GetComponent<Arrows.ArrowController>().InitArrow(types, controller.ID);
+			arrow.transform.FindChild("Model").GetComponent<TrailRenderer>().material.color = firePoint.GetComponent<SpriteRenderer>().color;
 			strength = 0;
         }
 
@@ -55,14 +56,25 @@ namespace Assets.Scripts.Player
         /// <param name="position">Position where the firepoint is set to</param>
         public void UpdateFirePoint(Vector3 position)
         {
-			if(Vector3.Distance(firePoint.localPosition, position) < 0.05f) {
-				IncreaseStrength();
+			IncreaseStrength();
+			firePoint.localPosition = position*strength*2f;
+
+			//Makes the curving aim line
+			Vector3[] linePoints = new Vector3[10];
+			float scale = 0.1f;
+			Vector3 aVel = (firePoint.position - (bowPosition.position+Vector3.up*0.1f)) * 20 * (strength+0.1f);
+			aVel = new Vector3(aVel.x,aVel.y);
+			Vector3 aPos = bowPosition.position + (firePoint.position - bowPosition.position)/2f;
+			for(int i = 0; i < linePoints.Length; i++) {
+				linePoints[i] = new Vector3(aPos.x, aPos.y);
+				aPos += aVel*scale;
+				aVel += Vector3.up*Physics.gravity.y*scale;
 			}
-            firePoint.localPosition = position;
+			firePoint.GetComponent<LineRenderer>().SetPositions(linePoints);
         }
 
 		private void IncreaseStrength() {
-			strength = Mathf.Min(MAX_STRENGTH,strength+(Time.deltaTime));
+			strength = Mathf.Min(MAX_STRENGTH,strength+(Time.deltaTime/2f));
 		}
 
 		public void UpdateBodyAim() {
@@ -95,6 +107,8 @@ namespace Assets.Scripts.Player
 
 		void LateUpdate() {
 			UpdateBodyAim();
+			if(strength == 0) firePoint.GetComponent<LineRenderer>().SetColors(Color.clear,Color.clear);
+			else firePoint.GetComponent<LineRenderer>().SetColors(firePoint.GetComponent<SpriteRenderer>().color, firePoint.GetComponent<SpriteRenderer>().color);
 		}
 
 		public void AimUpperBodyWithLegs() {
@@ -122,35 +136,48 @@ namespace Assets.Scripts.Player
             // Handle what type of token was collected
             if (token.GetType().Equals(typeof(ArrowToken)))
             {
-                // Find the running timer associated with the token
-                TokenTimer t = timers.Find(i => i.ID.Equals(((ArrowToken)token).Type.ToString()));
-                // If the token has not been collected yet
-                if (t == null)
-                {
-                    // Add a new Token Timer and initialize it
-                    TokenTimer tt = gameObject.AddComponent<TokenTimer>();
-                    tt.Initialize(TokenTimer.TOKEN_INTERVAL, ((ArrowToken)token).Type.ToString());
-                    // Make sure that the token is removed from the component when the timer times out
-                    tt.TimeOut += new TokenTimer.TimerEvent(RemoveToken);
-                    types = Bitwise.SetBit(types, (int)tt.TokenType);
-                    timers.Add(tt);
-                }
-                else
-                {
-                    // Token has already been collected so we just need to reset the timer
-                    t.Reset();
-                }
+				AddArrowType(((ArrowToken)token).Type);
             }
         }
+
+		public void AddArrowType(Enums.Arrows type)
+		{
+			if(type > 0 && type < Enums.Arrows.NumTypes)
+			{
+				// Find the running timer associated with the type
+				TokenTimer t = timers.Find(i => i.ID.Equals(type.ToString()));
+				// If the type has not been added yet
+				if (t == null)
+				{
+					// Add a new Token Timer and initialize it
+					TokenTimer tt = gameObject.AddComponent<TokenTimer>();
+					tt.Initialize(TokenTimer.TOKEN_INTERVAL, type.ToString());
+					// Make sure that the type is removed from the component when the timer times out
+					tt.TimeOut += new TokenTimer.TimerEvent(RemoveToken);
+					types = Bitwise.SetBit(types, (int)type);
+					timers.Add(tt);
+				}
+				else
+				{
+					// Type has already been added so we just need to reset the timer
+					t.Reset();
+				}
+			}
+		}
 
         // Removes the token from the types the player has collected
         private void RemoveToken(TokenTimer tt)
         {
-            // Clear the appropriate token bit and remove the timer from the list of running timers
-            types = Bitwise.ClearBit(types, (int)tt.TokenType);
-            TokenTimer t = timers.Find(i => i.ID.Equals(tt.TokenType.ToString()));
-            timers.Remove(t);
+			RemoveArrowType(tt.TokenType);
         }
+
+		public void RemoveArrowType(Enums.Arrows type)
+		{
+			// Clear the appropriate token bit and remove the timer from the list of running timers
+			types = Bitwise.ClearBit(types, (int) type);
+			TokenTimer t = timers.Find(i => i.ID.Equals(type.ToString()));
+			timers.Remove(t);
+		}
 
         /// <summary>
         /// Removes all active tokens from the player so shooting an arrow is only the normal arrow
@@ -165,16 +192,19 @@ namespace Assets.Scripts.Player
             timers.Clear();
         }
 
-		public float StrengthPercentage {
-			get {
-				return strength/MAX_STRENGTH;
-			}
+		public float StrengthPercentage
+		{
+			get { return strength/MAX_STRENGTH; }
 		}
 
-		public bool UpperBodyFacingRight {
-			get {
-				return upperBodyFacingRight;
-			}
+		public bool UpperBodyFacingRight 
+		{
+			get { return upperBodyFacingRight; }
+		}
+
+		public int ArrowTypes 
+		{
+			get { return types; }
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace Assets.Scripts.Timers
         protected string id = "";
 
         /// <summary>
-        /// Initialze and start the timer
+        /// Initialize and start the timer
         /// </summary>
         /// <param name="interval">How long the timer will run for</param>
         /// <param name="id">ID of the timer</param>

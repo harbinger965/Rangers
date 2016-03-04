@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Assets.Scripts.Data;
 using Assets.Scripts.Level;
 using Assets.Scripts.Player;
 using Assets.Scripts.Util;
@@ -6,7 +7,7 @@ using Assets.Scripts.Util;
 namespace Assets.Scripts.Arrows
 {
     /// <summary>
-    /// Controls the different components of the arrow and activates all the effects upon inpact.
+    /// Controls the different components of the arrow and activates all the effects upon impact.
     /// </summary>
     public class ArrowController : MonoBehaviour
     {
@@ -20,12 +21,17 @@ namespace Assets.Scripts.Arrows
         [SerializeField]
         private LayerMask doNotActivate;
 
+        // Limit types you can have to be only 3
+        private int MAX_TYPES = 3;
         // Damage to be dealt when hit by an arrow
         private float damage = 10f;
         // Player IDs for passing along information
         private PlayerID fromPlayer, hitPlayer;
         // For ricochet arrows
         private float bounciness = 0;
+        // For tracking arrows
+        private float trackingTime = 0f;
+        private Controller trackingTarget;
 
         // Reference to arrowhead
         [SerializeField]
@@ -62,6 +68,49 @@ namespace Assets.Scripts.Arrows
 
         void Update()
         {
+            // Rotate the arrow towards the closest enemy if it is tracking
+            if (trackingTime > 0)
+            {
+                // Find closest enemy player
+                if (trackingTarget == null || !trackingTarget.GetComponent<Rigidbody>().isKinematic)
+                {
+                    trackingTarget = null;
+                    float minDistance = 0f;
+                    foreach (Controller player in GameManager.instance.AllPlayers)
+                    {
+                        float distance = Vector3.Distance(transform.position, player.transform.position);
+                        if (!player.GetComponent<Rigidbody>().isKinematic 
+                            && !player.ID.Equals(fromPlayer) && (trackingTarget == null || distance < minDistance))
+                        {
+                            trackingTarget = player;
+                            minDistance = distance;
+                        }
+                    }
+                }
+                // Changes arrow direction
+                if (trackingTarget != null)
+                {
+                    Vector3 direction = trackingTarget.transform.position - transform.position + new Vector3(0, 1, 0);
+                    direction /= direction.magnitude;
+                    float magnitude = rigidbody.velocity.magnitude;
+                    // Ceiling used to prevent excess time from accumulating
+                    //int iterations = Mathf.CeilToInt((trackingTime + Time.deltaTime) * 10) - Mathf.CeilToInt(trackingTime * 10);
+                    //for (int i = 0; i < iterations; i++)
+                    //{
+                    // Alters direction - Modify last value to change tracking intensity
+                    //rigidbody.velocity += direction * Mathf.Pow(magnitude, 2) / 25;
+                    rigidbody.AddForce(direction * 200);
+                    if (rigidbody.velocity.magnitude > 25) rigidbody.velocity /= magnitude * Time.deltaTime;
+                        // Scales magnitude back to original
+                        //rigidbody.velocity /= rigidbody.velocity.magnitude / magnitude;
+                    //}
+                }
+                trackingTime -= Time.deltaTime;
+            }
+            else
+            {
+                rigidbody.useGravity = true;
+            }
             // Point the arrow the direction it is travelling
             if (rigidbody != null && rigidbody.velocity != Vector3.zero)
             {
@@ -104,13 +153,14 @@ namespace Assets.Scripts.Arrows
 				GameObject g = new GameObject();
 				transform.parent = g.transform;
 				g.transform.parent = col.transform;
-				Destroy(this.gameObject,1f);
+				Destroy(g, 1f);
                 Destroy(this);
             }
             else
             {
                 // Reflect the arrow to bounce off object
                 rigidbody.velocity = Vector3.Reflect(prevVelocity, col.contacts[0].normal);
+                rigidbody.velocity = Vector3.Scale(rigidbody.velocity, new Vector3(1, 1, 0));
             }
         }
 
@@ -125,6 +175,7 @@ namespace Assets.Scripts.Arrows
 				Controller controller = col.transform.root.GetComponent<Controller>();
                 controller.LifeComponent.ModifyHealth(-damage, fromPlayer);
                 hitPlayer = controller.ID;
+				trackingTime = 0f;
             }
 			else if (col.transform.root.tag.Equals("Target"))
             {
@@ -149,7 +200,7 @@ namespace Assets.Scripts.Arrows
             if (types == 0) return;
             for(int i = 0; i < (int)Enums.Arrows.NumTypes; i++)
             {
-                // Check to see if the type exists int he current arrow
+                // Check to see if the type exists in the current arrow
                 if(Bitwise.IsBitOn(types, i))
                 {
                     // Add an arrow property and update the delegates
@@ -162,7 +213,7 @@ namespace Assets.Scripts.Arrows
             }
         }
 
-        /// Used to add the appropriatre script to the gameobject
+        /// Used to add the appropriate script to the gameobject
         private ArrowProperty GetArrowProperty(Enums.Arrows type)
         {
             switch(type)
@@ -180,11 +231,31 @@ namespace Assets.Scripts.Arrows
                     return gameObject.AddComponent<RicochetArrow>();
                 case Enums.Arrows.Ghost:
                     return gameObject.AddComponent<GhostArrow>();
-                case Enums.Arrows.Gravity:
-                    return gameObject.AddComponent<GravityArrow>();
+                case Enums.Arrows.ZeroGravity:
+                    return gameObject.AddComponent<ZeroGravityArrow>();
+				case Enums.Arrows.Lifesteal:
+					return gameObject.AddComponent<LifestealArrow>();
+                case Enums.Arrows.Tracking:
+                    rigidbody.useGravity = false;
+                    trackingTime = TrackingArrow.trackingTime;
+                    return gameObject.AddComponent<TrackingArrow>();
+				case Enums.Arrows.Virus:
+					return gameObject.AddComponent<VirusArrow>();
+				case Enums.Arrows.Splitting:
+					return gameObject.AddComponent<SplittingArrow>();
+                case Enums.Arrows.HeavyKnockback:
+                    return gameObject.AddComponent<HeavyKnockbackArrow>();
                 default:
                     return gameObject.AddComponent<NormalArrow>();
             }
         }
+
+		/// <summary>
+		/// Damage dealt by the arrow
+		/// </summary>
+		public float Damage 
+		{
+			get { return damage; }
+		}
     }
 }

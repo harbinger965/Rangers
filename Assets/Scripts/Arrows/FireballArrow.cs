@@ -15,7 +15,7 @@ namespace Assets.Scripts.Arrows
         public override void Effect(PlayerID hitPlayer)
         {
             base.Effect(hitPlayer);
-			spawnedReference.GetComponent<FireballAttack> ().UpdatePlayerInfo (fromPlayer, hitPlayer);
+			spawnedReference.GetComponent<FireballAttack>().UpdatePlayerInfo(fromPlayer, hitPlayer);
         }
     }
 }

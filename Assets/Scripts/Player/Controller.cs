@@ -21,22 +21,25 @@ namespace Assets.Scripts.Player
         // Distance from firePoint to player
         protected float distanceToPlayer = 1.5f;
 
-        // Componenets to manage
+        // Components to manage
         protected Parkour parkour;
         protected Life life;
         protected Archery archery;
         protected Profile profile;
+
+        public const int INVINCIBLE_FRAMES = 2;
+        protected int invincibleFrames = INVINCIBLE_FRAMES;
 
 		//Body parts for fun destruction
 		private List<RobotBodyPart> bodyParts;
 
         void Awake()
         {
-            // Init all componenets
+            // Initialize all componenets
             InitializePlayerComponents();
         }
 
-        void Start()
+        protected void Start()
         {
             // Initialize the effect timers list
             effectTimers = new List<Timer>();
@@ -127,6 +130,17 @@ namespace Assets.Scripts.Player
         {
             get { return id; }
             set { id = value; }
+        }
+
+        public int InvincibleFrames
+        {
+            get { return invincibleFrames; }
+            set { invincibleFrames = value; }
+        }
+
+        public bool Invincible
+        {
+            get { return invincibleFrames > 0; }
         }
         #endregion
     }

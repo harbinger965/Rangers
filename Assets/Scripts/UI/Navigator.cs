@@ -20,7 +20,7 @@ namespace Assets.Scripts.UI
         /// </summary>
         /// <param name="direction">The direction to move</param>
         public static void Navigate(Enums.MenuDirections direction)
-        {
+		{
             // Get the currently selected gameobject
             GameObject next = EventSystem.current.currentSelectedGameObject;
             if (next == null)

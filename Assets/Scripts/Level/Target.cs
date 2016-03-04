@@ -11,7 +11,8 @@ namespace Assets.Scripts.Level
         /// <param name="fromPlayer">The player that hit the target</param>
         public void TargetHit(PlayerID fromPlayer)
         {
-            GameManager.instance.TargetDestroyed(fromPlayer);
+            //GameManager.instance.TargetDestroyed(fromPlayer);
+            TargetLevelManager.instance.TargetDestroyed(fromPlayer);
             Destroy(gameObject);
         }
     } 

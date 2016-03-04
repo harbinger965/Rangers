@@ -54,5 +54,19 @@ namespace Assets.Scripts.Timers
             // If the event has subscribers, fire it
             if (TimeOut != null) TimeOut(this);
         }
+
+        /// <summary>
+        /// Creates a countdown timer on a GameObject.
+        /// </summary>
+        /// <param name="gameObject">The game object to add the timer to.</param>
+        /// <param name="interval">How long the timer will run for.</param>
+        /// <param name="id">ID of the timer.</param>
+        /// <param name="timerEvent">The function to call when the timer runs out.</param>
+        public static void CreateTimer(GameObject gameObject, float interval, string id, TimerEvent timerEvent)
+        {
+            CountdownTimer timer = gameObject.AddComponent<CountdownTimer>();
+            timer.Initialize(interval, id);
+            timer.TimeOut += new CountdownTimer.TimerEvent(timerEvent);
+        }
     }
 }

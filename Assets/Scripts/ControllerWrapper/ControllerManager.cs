@@ -16,52 +16,69 @@ public class ControllerManager  {
 
     public ControllerManager()
     {
-//        setUpControls();
 		setUpPlatform();
 		playerControls = new Dictionary<PlayerID, ControllerInputWrapper>();
-		if(instance != this) {
+		if(instance != this) 
+		{
 			instance = this;
 		}
     }
 
-	public void AddPlayer(ControllerInputWrapper.Buttons connectCode) {
+	public int NumPlayers 
+	{
+		get { return playerControls.Count; }
+	}
+
+	public bool AddPlayer(ControllerInputWrapper.Buttons connectCode) {
 		KeyboardWrapper kw = new KeyboardWrapper(-1);
-		if(!playerControls.ContainsValue(kw) && kw.GetButton(connectCode)) {
-			for(int j = 1; j < 5; j++) {
-				if(!playerControls.ContainsKey((PlayerID)j)) {
+		if(!playerControls.ContainsValue(kw) && kw.GetButton(connectCode)) 
+		{
+			for(int j = 1; j < 5; j++) 
+			{
+				if(!playerControls.ContainsKey((PlayerID)j)) 
+				{
 					playerControls.Add((PlayerID)(j), kw);
 					Debug.Log((PlayerID)(j) + ": " + kw + " added");
-					return;
+					return true;
 				}
 			}
 		}
-		if(playerControls.Count < 4) {
+		if(playerControls.Count < 4) 
+		{
 			string[] controllerNames = Input.GetJoystickNames();
-			for (int i = 0; i < controllerNames.Length; i++) {
+			for (int i = 0; i < controllerNames.Length; i++) 
+			{
 				ControllerInputWrapper ciw = getControllerType(i);
-				if(ciw != null && !playerControls.ContainsValue(ciw) && ciw.GetButton(connectCode)) {
-					for(int j = 1; j < 5; j++) {
-						if(!playerControls.ContainsKey((PlayerID)j)) {
+				if(ciw != null && !playerControls.ContainsValue(ciw) && ciw.GetButton(connectCode)) 
+				{
+					for(int j = 1; j < 5; j++) 
+					{
+						if(!playerControls.ContainsKey((PlayerID)j)) 
+						{
 							playerControls.Add((PlayerID)(j), ciw);
 							Debug.Log((PlayerID)(j) + ": " + ciw + " added");
-							break;
+							return true;
 						}
 					}
 				}
 			}
 		}
+		return false;
 	}
 
-	public void AllowPlayerRemoval(ControllerInputWrapper.Buttons removalButton) {
+	public void AllowPlayerRemoval(ControllerInputWrapper.Buttons removalButton) 
+	{
 		PlayerID playerToRemove = PlayerID.None;
-		foreach(KeyValuePair<PlayerID, ControllerInputWrapper> kvp in ControllerManager.instance.playerControls) {
-			if(kvp.Value.GetButton(removalButton)) {
+		foreach(KeyValuePair<PlayerID, ControllerInputWrapper> kvp in ControllerManager.instance.playerControls) 
+		{
+			if(kvp.Value.GetButton(removalButton)) 
+			{
 				playerToRemove = kvp.Key;
 				break;
 			}
 		}
 		if(playerToRemove != PlayerID.None) {
-			Debug.Log(playerToRemove + " removed");
+//			Debug.Log(playerToRemove + " removed");
 			playerControls.Remove(playerToRemove);
 		}
 	}
@@ -140,15 +157,25 @@ public class ControllerManager  {
 		return playerControls[id].GetTrigger(trigger, isRaw);
     }
 
-	public bool GetButton(ControllerInputWrapper.Buttons button, PlayerID id, bool isDown = false)
+	public bool GetButton(ControllerInputWrapper.Buttons button, PlayerID id)
     {
 		if(!playerControls.ContainsKey(id)) return false;
 		if (playerControls[id] == null)
 		{
 			return false;
 		}
-		return playerControls[id].GetButton(button, isDown);
+		return playerControls[id].GetButton(button);
     }
+
+	public bool GetButtonDown(ControllerInputWrapper.Buttons button, PlayerID id) 
+	{
+		if(!playerControls.ContainsKey(id)) return false;
+		if (playerControls[id] == null)
+		{
+			return false;
+		}
+		return playerControls[id].GetButtonDown(button);
+	}
 
     public bool GetButtonUp(ControllerInputWrapper.Buttons button, int joyNum)
     {

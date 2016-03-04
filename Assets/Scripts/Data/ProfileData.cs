@@ -8,25 +8,25 @@ using Assets.Scripts.Util;
 [Serializable]
 public class ProfileData
 {
-    private string name;
+	private string tag;
     private Color primary, secondary;
 
     public ProfileData()
     {
-        name = "";
+        tag = "";
         primary = CustomColor.Black;
         secondary = CustomColor.White;
     }
     public ProfileData(string name)
     {
-        this.name = name;
+        this.tag = name;
         primary = CustomColor.Black;
         secondary = CustomColor.White;
     }
 
     public string Name
     {
-        get { return name; }
-        set { name = value; }
+        get { return tag; }
+        set { tag = value; }
     }
 }

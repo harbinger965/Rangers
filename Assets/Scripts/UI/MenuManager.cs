@@ -2,6 +2,7 @@
 using UnityEngine.EventSystems;
 using Assets.Scripts.Data;
 using Assets.Scripts.Util;
+using Assets.Scripts.UI.Profiles;
 
 namespace Assets.Scripts.UI
 {
@@ -18,7 +19,7 @@ namespace Assets.Scripts.UI
         private bool dpadPressed;
 
         [SerializeField]
-        private Transform SplashPanel, MainPanel, SinglePanel, MultiPanel, SettingPanel, AudioPanel, VideoPanel;
+        private Transform SplashPanel, MainPanel, SignInPanel, SinglePanel, MultiPanel, SettingPanel, AudioPanel, VideoPanel, PlayerPanel;
 
         
         void Awake()
@@ -28,6 +29,7 @@ namespace Assets.Scripts.UI
                 DontDestroyOnLoad(gameObject);
                 instance = this;
                 UpdatePanels(SplashPanel);
+				ControllerManager manager = new ControllerManager();
             }
             else if (instance != this)
             {
@@ -45,6 +47,9 @@ namespace Assets.Scripts.UI
                 case Enums.UIStates.Main:
                     Main();
                     break;
+				case Enums.UIStates.Signin:
+					SignIn();
+					break;
                 case Enums.UIStates.SinglePlayer:
                     SinglePlayer();
                     break;
@@ -67,20 +72,21 @@ namespace Assets.Scripts.UI
 
         private void Splash()
         {
-			if(ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.Start, PlayerID.One))
+			ControllerManager.instance.AddPlayer(ControllerInputWrapper.Buttons.Start);
+			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start, PlayerID.One))
             {
-                if (GameManager.instance.AllPlayers.Count == 0)
-                {
-                    state = Enums.UIStates.Signin;
-                    //UpdatePanels();
-                }
-                else
-                {
-                    state = Enums.UIStates.Main;
-                    UpdatePanels(MainPanel);
-                }
+//                if (GameManager.instance.AllPlayers.Count == 0)
+//                {
+//                    state = Enums.UIStates.Signin;
+//                    //UpdatePanels();
+//                }
+//                else
+//                {
+					state = Enums.UIStates.Signin;
+					UpdatePanels(SignInPanel);
+//                }
             }
-			if(ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 ExitGame();
             }
@@ -91,10 +97,28 @@ namespace Assets.Scripts.UI
             Navigate(); 
         }
 
+		private void SignIn()
+		{
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			{
+				state = Enums.UIStates.Splash;
+				UpdatePanels(SplashPanel);
+			}
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start, PlayerID.One))
+			{
+				string text = SignInPanel.FindChild("NameCreator").FindChild("LetterHolder").GetComponent<NameCreator>().t.text;
+				if(text.Length == 4) {
+					ProfileData pd = new ProfileData(text);
+					ProfileManager.instance.AddProfile(pd);
+					SignInToMain();
+				}
+			}
+		}
+
         private void SinglePlayer()
         {
             Navigate();
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
@@ -104,7 +128,7 @@ namespace Assets.Scripts.UI
         private void Multiplayer()
         {
             Navigate();
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
@@ -114,7 +138,7 @@ namespace Assets.Scripts.UI
         private void Settings()
         {
             Navigate();
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
@@ -124,7 +148,7 @@ namespace Assets.Scripts.UI
         private void Audio()
         {
             Navigate();
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 state = Enums.UIStates.Settings;
                 UpdatePanels(SettingPanel);
@@ -134,7 +158,7 @@ namespace Assets.Scripts.UI
         private void Video()
         {
             Navigate();
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
                 state = Enums.UIStates.Settings;
                 UpdatePanels(SettingPanel);
@@ -161,14 +185,14 @@ namespace Assets.Scripts.UI
         private void Navigate()
         {
             // No axis is being pressed
-			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX,PlayerID.One) == 0)
+			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) == 0)
             {
                 // Reset the timer so that we don't continue scrolling
                 hTimer = 0;
             }
             // Horizontal joystick is held right
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX,PlayerID.One) > 0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) > 0.5f)
             {
                 // If we can move and it is time to move
                 if (hTimer >= delay || hTimer == 0)
@@ -181,7 +205,7 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held left
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX,PlayerID.One) < -0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) < -0.5f)
             {
                 // If we can move and it is time to move
                 if (hTimer >= delay || hTimer == 0)
@@ -194,14 +218,14 @@ namespace Assets.Scripts.UI
             }
 
             // No axis is being pressed
-			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickY,PlayerID.One) == 0)
+			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) == 0)
             {
                 // Reset the timer so that we don't continue scrolling
                 vTimer = 0;
             }
             // Horizontal joystick is held right
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickY,PlayerID.One) > 0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) > 0.5f)
             {
                 // If we can move and it is time to move
                 if (vTimer >= delay || vTimer == 0)
@@ -214,7 +238,7 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held left
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickY,PlayerID.One) < -0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) < -0.5f)
             {
                 // If we can move and it is time to move
                 if (vTimer >= delay || vTimer == 0)
@@ -257,14 +281,28 @@ namespace Assets.Scripts.UI
             }
             
 
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A, PlayerID.One)) Navigator.CallSubmit();
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.A, PlayerID.One)) Navigator.CallSubmit();
         }
+
+		public void SignInToMain()
+		{
+			state = Enums.UIStates.Main;
+			UpdatePanels(MainPanel);
+			PlayerPanel.gameObject.SetActive(true);
+			PlayerPanel.SetAsLastSibling();
+		}
 
         public void CallSinglePlayer()
         {
             state = Enums.UIStates.SinglePlayer;
             UpdatePanels(SinglePanel);
         }
+
+		public void CallMain()
+		{
+			state = Enums.UIStates.Main;
+			UpdatePanels(MainPanel);
+		}
 
         public void CallMultiPlayer()
         {
@@ -299,7 +337,7 @@ namespace Assets.Scripts.UI
         {
             if (panel)
             {
-                panel.gameObject.SetActive(true);
+				panel.gameObject.SetActive(true);
                 panel.SetAsLastSibling();
             }
             GameObject defaultButton = panel.GetComponent<MenuOption>().DefaultButton;
@@ -308,7 +346,7 @@ namespace Assets.Scripts.UI
                 EventSystem.current.SetSelectedGameObject(defaultButton);
                 Navigator.defaultGameObject = defaultButton;
             }
-            if (activePanel) activePanel.gameObject.SetActive(false);
+			if (activePanel) activePanel.gameObject.SetActive(false);
             activePanel = panel;
         }
     } 

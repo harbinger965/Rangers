@@ -41,6 +41,9 @@ namespace Assets.Scripts.UI.Profiles
         // Used for Windows dpad which is an axis
         dpadPressed = false;
 
+		//Which player is controlling this instance of the creator, Player one by default
+		public PlayerID id = PlayerID.One;
+
         // Current letter highlighted
         private int index = 0;
 
@@ -56,7 +59,7 @@ namespace Assets.Scripts.UI.Profiles
             {
                 GameObject newLetter = Instantiate(textPrefab);
                 newLetter.GetComponent<Text>().text = characters[i].ToString();
-                newLetter.transform.SetParent(contentPanel);
+				newLetter.transform.SetParent(contentPanel,false);
             }
             // Step to increase target by
             step = (1.0f / (characters.Length - 1));
@@ -65,14 +68,14 @@ namespace Assets.Scripts.UI.Profiles
         void Update()
         {
             // No axis is being pressed
-			if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX, PlayerID.One) == 0)
+			if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id) == 0)
             {
                 // Reset the timer so that we don't continue scrolling
                 timer = 0;
             }
             // Horizontal joystick is held right
             // Use > 0.5f so that sensitivity is not too high
-			else if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX, PlayerID.One) > 0.5f)
+			else if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id) > 0.5f)
             {
                 // If we can move and it is time to move
                 if(index < characters.Length && (timer >= delay || timer == 0))
@@ -85,7 +88,7 @@ namespace Assets.Scripts.UI.Profiles
             }
             // Horizontal joystick is held left
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickX, PlayerID.One) < -0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id) < -0.5f)
             {
                 // If we can move and it is time to move
                 if (index > 0 && (timer >= delay || timer == 0))
@@ -97,13 +100,13 @@ namespace Assets.Scripts.UI.Profiles
                 timer += Time.deltaTime;
             }
             // A button is pressed
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A, PlayerID.One, true))
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.A, id))
             {
                 // Debug - add letter to overall string
                 t.text += capital ? characters[index].ToString() : characters[index].ToString().ToLower();
             }
             // Left joystick button is pressed
-			if(ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.LeftStickClick, PlayerID.One, true))
+			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.LeftStickClick, id))
             {
                 // Check capitalization
                 if(capital)
@@ -120,26 +123,30 @@ namespace Assets.Scripts.UI.Profiles
                 }
             }
             // Y button is pressed; add a space
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.Y, PlayerID.One, true)) t.text += " ";
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Y, id)) t.text += " ";
             // X button is pressed; delete last character added
-			if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.X, PlayerID.One, true) && t.text != "") t.text = t.text.Remove(t.text.Length - 1); 
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id) && t.text != "") t.text = t.text.Remove(t.text.Length - 1); 
             // Have dpad functionality so that player can have precise control and joystick quick navigation
             // Check differently for Windows vs OSX
 
             // No dpad button is pressed
-			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, PlayerID.One) == 0) dpadPressed = false;
+			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, id) == 0) dpadPressed = false;
             // Dpad right is pressed; treating as DPADRightOnDown
-			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, PlayerID.One) > 0 && !dpadPressed && index <characters.Length)
+			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, id) > 0 && !dpadPressed && index <characters.Length)
             {
                 dpadPressed = true;
                 Move(1);
             }
             // Dpad right is pressed; treating as DPADLeftOnDown
-			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, PlayerID.One) < 0 && !dpadPressed && index > 0)
+			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, id) < 0 && !dpadPressed && index > 0)
             {
                 dpadPressed = true;
                 Move(-1);
             }
+
+			if(t.text.Length > 4) {
+				t.text = t.text.Substring(0,4);
+			}
 
             // Current position of the horizontal scrollrect amount
             Vector3 rectPos = new Vector3(rect.horizontalNormalizedPosition, 0, 0);
@@ -150,12 +157,12 @@ namespace Assets.Scripts.UI.Profiles
             // Clamp from 0-1 as is the range of horizontalNormalizedPosition
             rect.horizontalNormalizedPosition = Mathf.Clamp01(rect.horizontalNormalizedPosition);
 
-			if(ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.Start, PlayerID.One))
-            {
-                ProfileData data;
+//			if(ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.Start, PlayerID.One))
+//            {
+//                ProfileData data;
 //                if (t.text != "")
 //                    data = new ProfileData(t.text);
-            }
+//            }
         }
 
         /// <summary>
@@ -165,7 +172,9 @@ namespace Assets.Scripts.UI.Profiles
         public void Move(int dir)
         {
             // Increase/decrease the index of the current character
-            index += dir;
+			if(index + dir >= 0 && index + dir <= characters.Length)
+				index += dir;
+
             // Set the target of the scroll to lerp to
             target += step * dir;
         }

@@ -3,7 +3,7 @@
 namespace Assets.Scripts.Arrows
 {
     /// <summary>
-    /// This is the componenet added to the arrow if the acid token was picked up.
+    /// This is the component added to the arrow if the acid token was picked up.
     /// It will add an acid effect to the player that deals damage over time.
     /// </summary>
     public class AcidArrow : ArrowProperty

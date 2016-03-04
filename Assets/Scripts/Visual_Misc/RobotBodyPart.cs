@@ -2,7 +2,8 @@
 using System.Collections;
 using Assets.Scripts.Player;
 
-public class RobotBodyPart : MonoBehaviour {
+public class RobotBodyPart : MonoBehaviour 
+{
 
 	public GameObject copy;
 	private Rigidbody rb;
@@ -11,7 +12,8 @@ public class RobotBodyPart : MonoBehaviour {
 	private bool respawning;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		//gets playerID from parent
 		pid = transform.root.GetComponent<Controller>().ID;
 
@@ -24,11 +26,14 @@ public class RobotBodyPart : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		if(respawning) {
+	void Update () 
+	{
+		if(respawning)
+		{
 			copy.transform.position = Vector3.MoveTowards(copy.transform.position, transform.position, Time.deltaTime*(1+Vector3.Distance(copy.transform.position,transform.position)));
 			copy.transform.rotation = Quaternion.RotateTowards(copy.transform.rotation, transform.rotation, Time.deltaTime*90f);
-			if(Vector3.Distance(copy.transform.position,transform.position) < 0.01f) { 
+			if(Vector3.Distance(copy.transform.position,transform.position) < 0.01f) 
+			{ 
 				respawning = false;
 				GetComponent<MeshRenderer>().enabled = true;
 				copy.gameObject.SetActive(false);
@@ -36,10 +41,12 @@ public class RobotBodyPart : MonoBehaviour {
 		}
 	}
 
-	public void DestroyBody() {
+	public void DestroyBody() 
+	{
 		//move the body parts to where the players body is/was
-		//I don't know why i have to check to see if copy is null but for some reason some of them are null and idk why
-		if(copy != null) {
+		//I don't know why I have to check to see if copy is null but for some reason some of them are null and idk why
+		if(copy != null) 
+		{
 			bc.enabled = true;
 			rb.isKinematic = false;
 			GetComponent<MeshRenderer>().enabled = false;
@@ -49,8 +56,10 @@ public class RobotBodyPart : MonoBehaviour {
 		}
 	}
 
-	public void RespawnBody() {
-		if(copy != null) {
+	public void RespawnBody()
+	{
+		if(copy != null)
+		{
 			bc.enabled = false;
 			rb.isKinematic = true;
 			respawning = true;

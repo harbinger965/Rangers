@@ -154,8 +154,8 @@ namespace Assets.Scripts.Data
         /// <summary>
         /// Gets a file of game settings from the file name
         /// </summary>
-        /// <param name="extension">Where th file is located</param>
-        /// <returns>The game settings from disk</returns>
+        /// <param name="extension">Where the file is located</param>
+        /// <returns>The game settings from resources</returns>
         public static GameSettings LoadGameSettingsXML(string extension)
         {
             // Get a default settings in case none exists
@@ -242,6 +242,51 @@ namespace Assets.Scripts.Data
                             tokens.Close();
                             break;
                         case "GameSettings":
+                            break;
+                        default:
+                            endofSettings = true;
+                            break;
+                    }
+                }
+            }
+            reader.Close();
+            return data;
+        }
+
+        /// <summary>
+        /// Gets a file of target settings from the file name
+        /// </summary>
+        /// <param name="extension">Where the file is located</param>
+        /// <returns>The game settings from resources</returns>
+        public static TargetSettings LoadTargetSettingsXML(string extension)
+        {
+            // Get a default settings in case none exists
+            TargetSettings data = new TargetSettings();
+
+            TextAsset xmlFile = (TextAsset)Resources.Load(xmlSettingsDataPath + extension);
+            MemoryStream assetStream = new MemoryStream(xmlFile.bytes);
+            XmlReader reader = XmlReader.Create(assetStream);
+
+            bool endofSettings = false;
+            while (reader.Read() && !endofSettings)
+            {
+                if (reader.IsStartElement())
+                {
+                    switch (reader.LocalName)
+                    {
+                        case "Platinum":
+                            data.PlatinumTime = reader.ReadElementContentAsFloat();
+                            break;
+                        case "Gold":
+                            data.GoldTime = reader.ReadElementContentAsFloat();
+                            break;
+                        case "Silver":
+                            data.SilverTime = reader.ReadElementContentAsFloat();
+                            break;
+                        case "Bronze":
+                            data.BronzeTime = reader.ReadElementContentAsFloat();
+                            break;
+                        case "TargetSettings":
                             break;
                         default:
                             endofSettings = true;

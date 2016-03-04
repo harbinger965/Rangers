@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Assets.Scripts.Level;
 using Assets.Scripts.Player;
@@ -12,6 +13,7 @@ namespace Assets.Scripts.Data
     /// </summary>
     public class GameManager : MonoBehaviour
     {
+        public string settingsName = "Stock";
         /// <summary>
         /// Use a singleton instance to make sure there is only one
         /// </summary>
@@ -61,6 +63,14 @@ namespace Assets.Scripts.Data
             InitializeMatch();
         }
 
+		void OnLevelWasLoaded(int level)
+		{
+			// Reinitialize when restarting a match.
+			controllers = new List<Controller>();
+			numDead = 0;
+			InitializeMatch();
+		}
+
         /// <summary>
         /// Initializes the match when one is started
         /// </summary>
@@ -74,7 +84,7 @@ namespace Assets.Scripts.Data
             }
             // Load the last settings used
             //currentGameSettings = LoadManager.LoadGameSettings(GameSettings.persistentExtension);
-            currentGameSettings = LoadManager.LoadGameSettingsXML("Kill");
+            currentGameSettings = LoadManager.LoadGameSettingsXML(settingsName);
 
             // Initialize the tokens
             TokenSpawner.instance.Init(currentGameSettings.EnabledTokens);
@@ -127,7 +137,16 @@ namespace Assets.Scripts.Data
         /// </summary>
         private void GameOver()
         {
-            Debug.Log("Match concluded");
+            //Debug.Log("Match concluded");
+            CountdownTimer.CreateTimer(gameObject, 3f, "GameOver", ResetLevel);
+        }
+
+        /// <summary>
+        /// Resets the scene.
+        /// </summary>
+        private void ResetLevel(CountdownTimer t)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>
@@ -211,6 +230,11 @@ namespace Assets.Scripts.Data
             Controller removePlayer = controllers.Find(x => x.ID.Equals(id));
             controllers.Remove(removePlayer);
         }
+
+		public Controller GetPlayer(PlayerID id) {
+			Controller p = controllers.Find(x => x.ID.Equals(id));
+			return p;
+		}
 
         #region C# Properties
         /// <summary>

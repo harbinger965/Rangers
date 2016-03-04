@@ -41,6 +41,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefabs:
   - {fileID: 112230, guid: 9f0f6ee773b344defa5987721d14a003, type: 2}
+  - {fileID: 192018, guid: 55b99fd91043fff48af370aac58329dc, type: 2}
+  - {fileID: 161430, guid: 5eb32a748558a1944bfd40023167dfbe, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -49,9 +51,17 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
+      propertyPath: effectPrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: effectPrefabs.Array.data[0]
       value: 
       objectReference: {fileID: 112230, guid: 9f0f6ee773b344defa5987721d14a003, type: 2}
+    - target: {fileID: 0}
+      propertyPath: effectPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 192018, guid: 55b99fd91043fff48af370aac58329dc, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 172548}

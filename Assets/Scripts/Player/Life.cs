@@ -32,9 +32,14 @@ namespace Assets.Scripts.Player
         /// <param name="id">The player who dealt the damage</param>
         public void ModifyHealth(float delta, PlayerID id = PlayerID.None)
         {
-            health = Mathf.Clamp((health + delta), 0, MAX_HEALTH);
-            Debug.Log("Health: " + health);
-            if (health <= 0) Die(id);
+            //if (controller.Invincible && delta < 0) return;
+            if (health > 0)
+            {
+                health = Mathf.Clamp((health + delta), 0, MAX_HEALTH);
+                Debug.Log("Health: " + health);
+                if (health <= 0) Die(id);
+                //controller.InvincibleFrames = Controller.INVINCIBLE_FRAMES;
+            }
         }
 
         // Handles when players die

@@ -4,11 +4,11 @@ using System.Reflection;
 namespace Assets.Scripts.Util
 {
 	/// <summary>
-	/// Used for convert normal colors to  Unity's colors that go from 0-1
+	/// Used for converting normal colors to  Unity's colors that go from 0-1
 	/// </summary>
 	public class CustomColor
 	{
-		public CustomColor(){}
+		public CustomColor() { }
 
 		private const float MAX_RGBVal = 255.0f;
 

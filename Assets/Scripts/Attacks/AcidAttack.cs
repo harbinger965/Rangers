@@ -9,7 +9,7 @@ namespace Assets.Scripts.Attacks
     /// </summary>
     public class AcidAttack : SpawnAttack
     {
-        // The timer to repeatidly damage the player
+        // The timer to repeatedly damage the player
         private RepetitionTimer t;
         // Amount of damage to deal to the player each iteration
         new protected float damage = 5;
@@ -22,9 +22,9 @@ namespace Assets.Scripts.Attacks
 
         void Start()
         {
-            // Get all AcidAttacks already on the player (this componenent should have at least been added)
+            // Get all AcidAttacks already on the player (this component should have at least been added)
             AcidAttack[] currentAttacks = gameObject.GetComponents<AcidAttack>();
-            // If this componenent is not the only AcidAttack on the player
+            // If this component is not the only AcidAttack on the player
             if(currentAttacks.Length > 1)
             {
                 for(int i  = 0; i < currentAttacks.Length; i++)

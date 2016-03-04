@@ -2,7 +2,7 @@
 namespace Assets.Scripts.Arrows
 {
     /// <summary>
-    /// Arrow propery that is on by default
+    /// Arrow property that is on by default
     /// </summary>
     public class NormalArrow : ArrowProperty
     {
