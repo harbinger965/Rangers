@@ -8707,7 +8707,7 @@ Transform:
   m_PrefabParentObject: {fileID: 459354, guid: 140d1869ff8e34934a5ac0961e0f4951, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 781906657}
-  m_LocalRotation: {x: 0.6486332, y: -0.3270553, z: -0.6086527, w: 0.31914246}
+  m_LocalRotation: {x: 0.6486331, y: -0.32705528, z: -0.60865265, w: 0.31914243}
   m_LocalPosition: {x: 0.0683514, y: 0.07508168, z: 0.01237604}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -11651,6 +11651,7 @@ MonoBehaviour:
   aiming: 0
   aim: {x: 0, y: 0, z: 0}
   defaultMoveSpeed: 1
+  reactionDelay: 0.2
   opponent: {fileID: 0}
 --- !u!114 &1187861747
 MonoBehaviour:
@@ -13334,6 +13335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 257ee598b11e0424d8ea83201775eba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settingsName: Stock
   allTokens:
   - {fileID: 148824, guid: 01a4cc8acebc9074ca37ca449dc7e031, type: 2}
   - {fileID: 148824, guid: 4079ebb4e81811f40b4b5045291e1d59, type: 2}
@@ -15907,7 +15909,7 @@ Transform:
   m_PrefabParentObject: {fileID: 459354, guid: 140d1869ff8e34934a5ac0961e0f4951, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1727027766}
-  m_LocalRotation: {x: 0.6486332, y: -0.3270553, z: -0.6086527, w: 0.31914246}
+  m_LocalRotation: {x: 0.6486331, y: -0.32705528, z: -0.60865265, w: 0.31914243}
   m_LocalPosition: {x: 0.0683514, y: 0.07508168, z: 0.01237604}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

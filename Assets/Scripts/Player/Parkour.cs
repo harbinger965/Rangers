@@ -18,6 +18,17 @@ namespace Assets.Scripts.Player
 		private float lastMotion;
 		private float jumpingTimeOffset;
 
+		/// <summary> The animator attached to the player. </summary>
+		private Animator animator;
+		/// <summary> The rigidbody attached to the player. </summary>
+		private Rigidbody rigidbody;
+
+		private void Start()
+		{
+			animator = GetComponent<Animator>();
+			rigidbody = GetComponent<Rigidbody>();
+		}
+
 		public void Locomote(float motion) 
 		{
 			transform.rotation = new Quaternion(0, transform.rotation.y, 0, transform.rotation.w);
@@ -29,50 +40,44 @@ namespace Assets.Scripts.Player
 			{
 				facingRight = false;
 			}
-			if(!sliding) 
+			if(facingRight && Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9))) 
 			{
-				if(facingRight && Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9))) 
-				{
-					GetComponent<Animator>().SetFloat("RunSpeed", Mathf.Min(0,motion));
-				} 
-				else if(!facingRight && Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9))) 
-				{
-					GetComponent<Animator>().SetFloat("RunSpeed", Mathf.Max(0,motion));
-				} 
-				else 
-				{
-					if(!jumping) 
-					{
-						GetComponent<Animator>().SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
-					} 
-					else 
-					{
-						GetComponent<Animator>().SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
-					}
-				}
-				lastMotion = motion;
+				animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
+			} 
+			else if(!facingRight && Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9))) 
+			{
+				animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
 			} 
 			else 
 			{
-				GetComponent<Animator>().SetFloat("RunSpeed", 0);
+				if(!jumping) 
+				{
+					animator.SetFloat("RunSpeed", motion);
+					transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
+				} 
+				else 
+				{
+					animator.SetFloat("RunSpeed", motion);
+					transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
+				}
 			}
-
+			lastMotion = motion;
+			AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+			sliding = state.IsName("Slide") || state.IsName("SlideLeft");
 		}
 
 		public void Jump() 
 		{
 			if(!jumping) 
 			{
-				GetComponent<Animator>().ResetTrigger("Land");
+				animator.ResetTrigger("Land");
 				if(facingRight)
 				{
-					GetComponent<Animator>().SetTrigger("Jump");
+					animator.SetTrigger("Jump");
 				} 
 				else if (!facingRight) 
 				{
-					GetComponent<Animator>().SetTrigger("JumpLeft");
+					animator.SetTrigger("JumpLeft");
 				}
 				jumping = true;
 				jumpingTimeOffset = 0.1f;
@@ -82,60 +87,60 @@ namespace Assets.Scripts.Player
 		void Update() 
 		{
 			jumpingTimeOffset -= Time.deltaTime;
-//			if(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Slide")) {
-////				transform.Translate(Vector3.right*lastMotion*Time.deltaTime*16f, Space.World);
-//				sliding = true;
-////				if(GetComponent<Animator>().IsInTransition(0)) {
-////					lastMotion -= Time.deltaTime;
-////				}
-//			} else if(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
-////				transform.Translate(-Vector3.left*lastMotion*Time.deltaTime*16f, Space.World);
-//				sliding = true;
-////				if(GetComponent<Animator>().IsInTransition(0)) {
-////					lastMotion += Time.deltaTime;
-////				}
-//			} else {
-//				sliding = false;
-//			}
-//			if((facingRight && !Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9)))
-//				|| (!facingRight && !Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9)))) {
-//
-//				if((GetComponent<Animator>().GetAnimatorTransitionInfo(0).IsName("WalkRunRight -> Slide")
-//					|| GetComponent<Animator>().GetAnimatorTransitionInfo(0).IsName("WalkRunLeft -> SlideLeft"))
-//					&& !GetComponent<Animator>().IsInTransition(0)) {
-//					sliding = true;
-//					transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*8f);
-//				} else if(GetComponent<Animator>().GetAnimatorTransitionInfo(0).IsName("Slide -> WalkRunRight")) {
-//					sliding = false;
-//					transform.Translate(Vector3.forward*Time.deltaTime*8);
-//				} else if(GetComponent<Animator>().GetAnimatorTransitionInfo(0).IsName("SlideLeft -> WalkRunLeft")) {
-//					sliding = false;
-//					transform.Translate(-Vector3.forward*Time.deltaTime*8);
-//				} else if(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Slide") || GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
-//					if(!GetComponent<Animator>().IsInTransition(0)) {
-//						transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*10);
-//						GetComponent<Rigidbody>().AddForce(Vector3.down*10f, ForceMode.Acceleration);
-//					}
-//				}
-//
-//			}
+			//			if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide")) {
+			////				transform.Translate(Vector3.right*lastMotion*Time.deltaTime*16f, Space.World);
+			//				sliding = true;
+			////				if(animator.IsInTransition(0)) {
+			////					lastMotion -= Time.deltaTime;
+			////				}
+			//			} else if(animator.GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
+			////				transform.Translate(-Vector3.left*lastMotion*Time.deltaTime*16f, Space.World);
+			//				sliding = true;
+			////				if(animator.IsInTransition(0)) {
+			////					lastMotion += Time.deltaTime;
+			////				}
+			//			} else {
+			//				sliding = false;
+			//			}
+			//			if((facingRight && !Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9)))
+			//				|| (!facingRight && !Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9)))) {
+			//
+			//				if((animator.GetAnimatorTransitionInfo(0).IsName("WalkRunRight -> Slide")
+			//					|| animator.GetAnimatorTransitionInfo(0).IsName("WalkRunLeft -> SlideLeft"))
+			//					&& !animator.IsInTransition(0)) {
+			//					sliding = true;
+			//					transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*8f);
+			//				} else if(animator.GetAnimatorTransitionInfo(0).IsName("Slide -> WalkRunRight")) {
+			//					sliding = false;
+			//					transform.Translate(Vector3.forward*Time.deltaTime*8);
+			//				} else if(animator.GetAnimatorTransitionInfo(0).IsName("SlideLeft -> WalkRunLeft")) {
+			//					sliding = false;
+			//					transform.Translate(-Vector3.forward*Time.deltaTime*8);
+			//				} else if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide") || animator.GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
+			//					if(!animator.IsInTransition(0)) {
+			//						transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*10);
+			//						rigidbody.AddForce(Vector3.down*10f, ForceMode.Acceleration);
+			//					}
+			//				}
+			//
+			//			}
 
 
 		}
 
 		public void SlideVelocity() 
 		{
-			GetComponent<Rigidbody>().velocity = Vector3.right*lastMotion*10f;
+			rigidbody.velocity = Vector3.right*lastMotion*10f;
 		}
 
 		public void SlideOn() 
 		{
-			GetComponent<Animator>().SetBool("Slide", true);
+			animator.SetBool("Slide", true);
 		}
 
 		public void SlideOff() 
 		{
-			GetComponent<Animator>().SetBool("Slide", false);
+			animator.SetBool("Slide", false);
 		}
 
 		void OnAnimatorIK() 
@@ -152,35 +157,35 @@ namespace Assets.Scripts.Player
 			}
 			if(IKThingy != null) 
 			{
-				GetComponent<Animator>().SetIKPosition(AvatarIKGoal.RightHand,IKThingy.transform.position + new Vector3(-0.5f,0,0));
-				GetComponent<Animator>().SetIKPositionWeight(AvatarIKGoal.RightHand,1);
-				GetComponent<Animator>().SetIKPosition(AvatarIKGoal.LeftHand,IKThingy.transform.position + new Vector3(0.5f,0,0));
-				GetComponent<Animator>().SetIKPositionWeight(AvatarIKGoal.LeftHand,1);
+				animator.SetIKPosition(AvatarIKGoal.RightHand,IKThingy.transform.position + new Vector3(-0.5f,0,0));
+				animator.SetIKPositionWeight(AvatarIKGoal.RightHand,1);
+				animator.SetIKPosition(AvatarIKGoal.LeftHand,IKThingy.transform.position + new Vector3(0.5f,0,0));
+				animator.SetIKPositionWeight(AvatarIKGoal.LeftHand,1);
 				jumping = false;
-//				if(!ledgeGrabbing) 
-//				{
-//					GetComponent<Rigidbody>().velocity = Vector3.zero;
-//				}
-//				ledgeGrabbing = true;
+				//				if(!ledgeGrabbing) 
+				//				{
+				//					rigidbody.velocity = Vector3.zero;
+				//				}
+				//				ledgeGrabbing = true;
 			} 
 			else 
 			{
-//				ledgeGrabbing = false;
-				GetComponent<Animator>().SetIKPositionWeight(AvatarIKGoal.RightHand,0);
-				GetComponent<Animator>().SetIKPositionWeight(AvatarIKGoal.LeftHand,0);
+				//				ledgeGrabbing = false;
+				animator.SetIKPositionWeight(AvatarIKGoal.RightHand,0);
+				animator.SetIKPositionWeight(AvatarIKGoal.LeftHand,0);
 			}
 		}
 
 		public void JumpVelocity() 
 		{
-			GetComponent<Rigidbody>().velocity = Vector3.up*8f;
+			rigidbody.velocity = Vector3.up*8f;
 		}
 
 		void OnCollisionStay(Collision other) 
 		{
-			if((GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Airtime") || GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("AirtimeLeft")) && other.gameObject.tag.Equals("Ground")) 
+			if((animator.GetCurrentAnimatorStateInfo(0).IsName("Airtime") || animator.GetCurrentAnimatorStateInfo(0).IsName("AirtimeLeft")) && other.gameObject.tag.Equals("Ground")) 
 			{
-				GetComponent<Animator>().SetTrigger("Land");
+				animator.SetTrigger("Land");
 				jumping = false;
 			}
 		}
@@ -195,5 +200,14 @@ namespace Assets.Scripts.Player
 		/// </summary>
 		/// <param name="token">The token that was collected</param>
 		public override void CollectToken(Token token) { }
+
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="Assets.Scripts.Player.Parkour"/> is sliding.
+		/// </summary>
+		/// <value><c>true</c> if sliding; otherwise, <c>false</c>.</value>
+		public bool Sliding
+		{
+			get { return sliding; }
+		}
 	}
 }

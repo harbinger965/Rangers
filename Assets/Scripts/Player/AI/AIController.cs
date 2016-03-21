@@ -1,67 +1,67 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using Assets.Scripts.Data;
+using Assets.Scripts.Util;
 using System;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.Player.AI
 {
-    /// <summary> Interface for AI to control a character. </summary>
+    /// <summary>
+	/// Interface for AI to control a ranger.
+	/// </summary>
     public class AIController : Controller
     {
-        /// <summary> The policies used to decide the AI's actions. </summary>
-        private List<IPolicy> policies;
+        /// <summary> The policy used to decide the AI's actions. </summary>
+		private IPolicy policy;
 
-        /// <summary> The speed that the character is moving at. </summary>
+		/// <summary> The speed that the ranger is moving at. </summary>
         [SerializeField]
+		[Tooltip("The speed that the ranger is moving at.")]
         internal float runSpeed = 0;
 
-        /// <summary> Whether the character is jumping. </summary>
+		/// <summary> Whether the ranger is jumping. </summary>
         [SerializeField]
+		[Tooltip("Whether the ranger is jumping.")]
         internal bool jump = false;
-        /// <summary> Whether the character is sliding. </summary>
-        [SerializeField]
+		/// <summary> Whether the ranger is sliding. </summary>
+		[SerializeField]
+		[Tooltip("Whether the ranger is sliding.")]
         internal bool slide = false;
 
-        /// <summary> Whether the character is aiming a shot. </summary>
-        [SerializeField]
+        /// <summary> Whether the ranger is aiming a shot. </summary>
+		[SerializeField]
+		[Tooltip("Whether the ranger is aiming a shot.")]
         internal bool aiming = false;
-        /// <summary> Whether the character was aiming its shot on the last tick. </summary>
+        /// <summary> Whether the ranger was aiming its shot on the last tick. </summary>
         private bool wasAiming = false;
-        /// <summary> Vector in the direction that the character is aiming. </summary>
-        [SerializeField]
+        /// <summary> Vector in the direction that the ranger is aiming. </summary>
+		[SerializeField]
+		[Tooltip("Vector in the direction that the ranger is aiming.")]
         internal Vector3 aim = Vector3.zero;
 
-        /// <summary> The default movement speed of the character. </summmary>
-        [SerializeField]
+        /// <summary> The default movement speed of the ranger. </summmary>
+		[SerializeField]
+		[Tooltip("The default movement speed of the ranger.")]
         private float defaultMoveSpeed = 1;
 
-        /// <summary> The opponent of this character. </summary>
+        /// <summary> The opponent of this ranger. </summary>
+		[Tooltip("The opponent of this ranger.")]
         public Controller opponent;
 
-        /*AI Private backend*/
-        int[] spacingReinforcement = { 20, 20, 20 };  // reinforcement for spacing --Chris   (modify based on positive and negative feedback)
-        int[] distanceReinforcement = { 20, 20, 20 }; // dictates what range the bot wants to be at  (modify based on positive and negative feedback)
-        int chanceToShoot = 100;                    // modifier simulating passivity (lower is passive, higher is active)
-        int rangeClass = 0;                         // Range group label that is used to keep track of which range is given Incentive or Disincentive
-        System.Random random = new System.Random();
-        StandShoot shotInst = new StandShoot(1, 0.6f);
-        RushEnemy rushInst5 = new RushEnemy(3);
-        RushEnemy rushInst8 = new RushEnemy(4);
-        RushEnemy rushInst10 = new RushEnemy(5);
+		/// <summary> The AI mode that this ranger will use. </summary>
+		[Tooltip("The AI mode that this ranger will use.")]
+		public Enums.AIModes mode;
 
-
-        /// <summary> Initializes the AI policy to use. </summary>
-        void Start()
+        /// <summary>
+		/// Initializes the AI policy to use.
+		/// </summary>
+        private void Start()
         {
-            policies = new List<IPolicy>();
-            policies.Add(new StandShoot(1, 0.6f));
-
-            //Change up Ranges --Chris
-            policies.Add(new RushEnemy(3));
-            policies.Add(new RushEnemy(4));
-            policies.Add(new RushEnemy(5));
-
+			switch(mode)
+			{
+			case Enums.AIModes.ApproachShoot: policy = new ApproachShoot(); break;
+			case Enums.AIModes.RangerBot: policy = new RangerBot(); break;
+			}
             foreach (Controller controller in GameManager.instance.AllPlayers)
             {
                 if (controller != this)
@@ -73,64 +73,19 @@ namespace Assets.Scripts.Player.AI
             base.Start();
         }
 
-        /// <summary> Moves the agent every tick. </summary>
-        void Update()
+        /// <summary>
+		/// Moves the ranger every tick.
+		/// </summary>
+        private void Update()
         {
             if (opponent == null || life.Health <= 0)
             {
                 aiming = false;
                 return;
             }
-            else {
-                /* Forgive me, Cheng. I cannot determine a better way to break the determinism and access different policies individually.
-				foreach (IPolicy policy in policies) {
-					policy.ChooseAction(this);
-				}
-                */
-
-                float totalOppDistance = Vector3.Distance(opponent.transform.position, transform.position);
-                int shotChanceModifier = 0;
-
-                // Experiment with 3 distance groups (determines if the bot shoots)
-
-                //Choose the distance modifier
-                if (totalOppDistance < 5)
-                {
-                    shotChanceModifier = spacingReinforcement[0];
-                }
-                else if (totalOppDistance < 9)
-                {
-                    shotChanceModifier = spacingReinforcement[1];
-                }
-                else
-                {
-                    shotChanceModifier = spacingReinforcement[2];
-                }
-
-
-                //Check to see if CPU will shoot given the modifier
-                int randShotChance = random.Next(200000);
-                if (shotChanceModifier * chanceToShoot < randShotChance)
-                {
-                    shotInst.ChooseAction(this);
-                }
-
-                //Experiment with 3 distance groups (determines favorite distance)
-                int randMoveChance = random.Next(100);
-                if (randMoveChance < distanceReinforcement[0])
-                {
-                    rushInst5.ChooseAction(this);
-                }
-                else if (randMoveChance < (distanceReinforcement[0] + distanceReinforcement[1]))
-                {
-                    rushInst8.ChooseAction(this);
-                }
-                else if (randMoveChance < (distanceReinforcement[0] + distanceReinforcement[1] + distanceReinforcement[2]))
-                {
-                    //rushInst10.ChooseAction(this);
-                    rushInst10.ChooseAction(this);
-                }
-
+            else
+			{
+				policy.ChooseAction(this);
             }
 
             if (jump)
@@ -163,8 +118,10 @@ namespace Assets.Scripts.Player.AI
             }
         }
 
-        /// <summary> Updates the player's running movement. </summary>
-        void FixedUpdate()
+        /// <summary>
+		/// Updates the ranger's running movement.
+		/// </summary>
+        private void FixedUpdate()
         {
             if (life.Health > 0)
             {
@@ -173,7 +130,7 @@ namespace Assets.Scripts.Player.AI
         }
 
         /// <summary>
-        /// Sets the character's run speed in the direction of the given number.
+		/// Sets the ranger's run speed in the direction of the given number.
         /// </summary>
         /// <param name="direction">The direction to set the run speed to.</param>
         internal void SetRunInDirection(float direction)

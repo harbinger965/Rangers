@@ -106,6 +106,20 @@ namespace Assets.Scripts.Timers
         {
             if (FinalTick != null) FinalTick(this);
             Destroy(this);
-        }
+		}
+
+		/// <summary>
+		/// Creates a repetition timer on a GameObject.
+		/// </summary>
+		/// <param name="gameObject">The game object to add the timer to.</param>
+		/// <param name="interval">How long the timer will run for.</param>
+		/// <param name="id">ID of the timer.</param>
+		/// <param name="timerEvent">The function to call when the timer runs out.</param>
+		public static void CreateTimer(GameObject gameObject, float interval, string id, TimerEvent timerEvent)
+		{
+			RepetitionTimer timer = gameObject.AddComponent<RepetitionTimer>();
+			timer.Initialize(interval, id);
+			timer.TimeOut += new RepetitionTimer.TimerEvent(timerEvent);
+		}
     }
 }
