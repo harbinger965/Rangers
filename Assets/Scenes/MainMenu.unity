@@ -16072,6 +16072,72 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 869455970}
+--- !u!1 &873815617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 873815619}
+  - 114: {fileID: 873815618}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &873815618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 873815617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f943572a282614d598cb3435a85f1b94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  XBOX_A: {fileID: 21300000, guid: bcff2b433a9914e0d8cf950bbffdfc2e, type: 3}
+  PS4_A: {fileID: 21300000, guid: d1ca05c2e207744e38287307e092edd3, type: 3}
+  KEY_A: {fileID: 21300000, guid: 169dbd2f800b84a30b61f702d6ad1879, type: 3}
+  XBOX_B: {fileID: 21300000, guid: 13f7724e44ae54839af1901e730f7bfe, type: 3}
+  PS4_B: {fileID: 21300000, guid: 201a0b907711c498da01cdab6c214346, type: 3}
+  KEY_B: {fileID: 21300000, guid: daf941a8b42534670b6d6f813b31a252, type: 3}
+  XBOX_START: {fileID: 21300000, guid: 437a043e0f46a4e7798d60d2969ba8c5, type: 3}
+  PS4_START: {fileID: 21300000, guid: 38efd62a1fcfc47b2b7b44cce8498985, type: 3}
+  KEY_START: {fileID: 21300000, guid: f44444ddf346248729ea523b00331089, type: 3}
+  JOYLEFT: {fileID: 0}
+  DPAD_LEFTRIGHT: {fileID: 21300000, guid: 8667b74fb4f98452a86a147e484cb0dd, type: 3}
+  KEY_UPDOWNLEFTRIGHT: {fileID: 21300000, guid: 9da23f9341daa45bcafd9d87a01e8863,
+    type: 3}
+  KEY_LEFTRIGHT: {fileID: 21300000, guid: 27f5e0a073d3c4e128899d8e40f3e403, type: 3}
+  L_JOY_CLICK: {fileID: 21300000, guid: f6443df59653648b2babc45103f07b93, type: 3}
+  KEY_L_JOY_CLICK: {fileID: 21300000, guid: 8b3bdc93d3b7c498ebb7fbf3d269f103, type: 3}
+  R_JOY_CLICK: {fileID: 21300000, guid: 57c781a462d1e439f93a7f0fa364beb4, type: 3}
+  KEY_R_JOY_CLICK: {fileID: 21300000, guid: 5acce0179978d4b0f9a81a7854e5e724, type: 3}
+  XBOX_X: {fileID: 21300000, guid: 25ef2e94054aa4d428f574b278910f65, type: 3}
+  PS4_X: {fileID: 21300000, guid: 6f8a90d7949504b8d86d13327f88aa56, type: 3}
+  KEY_X: {fileID: 21300000, guid: 5c3a165b3620b4c8e9311bbca70d259c, type: 3}
+  XBOX_Y: {fileID: 21300000, guid: 45ca19975c57548e6b60e39736d34fb7, type: 3}
+  PS4_Y: {fileID: 21300000, guid: 982f60daf89f045a7b7895450ad4aecb, type: 3}
+  KEY_Y: {fileID: 21300000, guid: 60db76d584ca7403280d4f1cc096958f, type: 3}
+  XBOX_BACK: {fileID: 21300000, guid: e9faf315df8774429b180cbb1f04c002, type: 3}
+  PS4_BACK: {fileID: 21300000, guid: ed7fa01192c37400889e9e11bdca6865, type: 3}
+  KEY_BACK: {fileID: 21300000, guid: 40e52a6d4d8d24e0bbb79b371ee49670, type: 3}
+--- !u!4 &873815619
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 873815617}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 200.04874, y: 32.198074, z: 75.28438}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
 --- !u!1 &877684268
 GameObject:
   m_ObjectHideFlags: 0
@@ -20202,7 +20268,6 @@ GameObject:
   - 124: {fileID: 1075643673}
   - 81: {fileID: 1075643672}
   - 114: {fileID: 1075643676}
-  - 114: {fileID: 1075643677}
   - 114: {fileID: 1075643678}
   m_Layer: 0
   m_Name: Main Camera
@@ -20292,44 +20357,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 00c1b03884ebb45e18ce57793acf6322, type: 3}
---- !u!114 &1075643677
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1075643670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f943572a282614d598cb3435a85f1b94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  XBOX_A: {fileID: 21300000, guid: bcff2b433a9914e0d8cf950bbffdfc2e, type: 3}
-  PS4_A: {fileID: 21300000, guid: d1ca05c2e207744e38287307e092edd3, type: 3}
-  KEY_A: {fileID: 21300000, guid: 169dbd2f800b84a30b61f702d6ad1879, type: 3}
-  XBOX_B: {fileID: 21300000, guid: 13f7724e44ae54839af1901e730f7bfe, type: 3}
-  PS4_B: {fileID: 21300000, guid: 201a0b907711c498da01cdab6c214346, type: 3}
-  KEY_B: {fileID: 21300000, guid: daf941a8b42534670b6d6f813b31a252, type: 3}
-  XBOX_START: {fileID: 21300000, guid: 437a043e0f46a4e7798d60d2969ba8c5, type: 3}
-  PS4_START: {fileID: 21300000, guid: 38efd62a1fcfc47b2b7b44cce8498985, type: 3}
-  KEY_START: {fileID: 21300000, guid: f44444ddf346248729ea523b00331089, type: 3}
-  JOYLEFT: {fileID: 0}
-  DPAD_LEFTRIGHT: {fileID: 21300000, guid: 8667b74fb4f98452a86a147e484cb0dd, type: 3}
-  KEY_UPDOWNLEFTRIGHT: {fileID: 21300000, guid: 9da23f9341daa45bcafd9d87a01e8863,
-    type: 3}
-  KEY_LEFTRIGHT: {fileID: 21300000, guid: 27f5e0a073d3c4e128899d8e40f3e403, type: 3}
-  L_JOY_CLICK: {fileID: 21300000, guid: f6443df59653648b2babc45103f07b93, type: 3}
-  KEY_L_JOY_CLICK: {fileID: 21300000, guid: 8b3bdc93d3b7c498ebb7fbf3d269f103, type: 3}
-  R_JOY_CLICK: {fileID: 21300000, guid: 57c781a462d1e439f93a7f0fa364beb4, type: 3}
-  KEY_R_JOY_CLICK: {fileID: 21300000, guid: 5acce0179978d4b0f9a81a7854e5e724, type: 3}
-  XBOX_X: {fileID: 21300000, guid: 25ef2e94054aa4d428f574b278910f65, type: 3}
-  PS4_X: {fileID: 21300000, guid: 6f8a90d7949504b8d86d13327f88aa56, type: 3}
-  KEY_X: {fileID: 21300000, guid: 5c3a165b3620b4c8e9311bbca70d259c, type: 3}
-  XBOX_Y: {fileID: 21300000, guid: 45ca19975c57548e6b60e39736d34fb7, type: 3}
-  PS4_Y: {fileID: 21300000, guid: 982f60daf89f045a7b7895450ad4aecb, type: 3}
-  KEY_Y: {fileID: 21300000, guid: 60db76d584ca7403280d4f1cc096958f, type: 3}
-  XBOX_BACK: {fileID: 21300000, guid: e9faf315df8774429b180cbb1f04c002, type: 3}
-  PS4_BACK: {fileID: 21300000, guid: ed7fa01192c37400889e9e11bdca6865, type: 3}
-  KEY_BACK: {fileID: 21300000, guid: 40e52a6d4d8d24e0bbb79b371ee49670, type: 3}
 --- !u!114 &1075643678
 MonoBehaviour:
   m_ObjectHideFlags: 0

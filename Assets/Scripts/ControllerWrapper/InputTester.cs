@@ -14,7 +14,7 @@ public class InputTester : MonoBehaviour {
     {
         if (instance == null)
         {
-//			DontDestroyOnLoad(this);
+			DontDestroyOnLoad(this);
             instance = this;
             cm = new ControllerManager();
         }

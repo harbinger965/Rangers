@@ -57,11 +57,14 @@ namespace Assets.Scripts.UI
 				
         }
 
-		void OnLevelWasLoaded(int level) {
+		void OnEnable() {
 			Debug.Log(ControllerManager.instance.NumPlayers);
 			if(ControllerManager.instance.NumPlayers > 0) {
 				state = Enums.UIStates.Main;
 				UpdatePanels(MainPanel);
+				PlayerPanel.gameObject.SetActive(true);
+				PlayerPanel.SetAsFirstSibling();
+				menuTitle.SetActive(true);
 			}
 		}
 
