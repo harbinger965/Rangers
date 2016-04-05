@@ -21,7 +21,7 @@ namespace Assets.Scripts.Data
             {
                 // Add a repeating timer to keep spawning tokens
                 RepetitionTimer t = gameObject.AddComponent<RepetitionTimer>();
-                t.Initialize(5f, "Token Spawn Timer");
+                t.Initialize(10f, "Token Spawn Timer");
                 t.TimeOut += new RepetitionTimer.TimerEvent(SpawnTokenHelper);
             }
         }
@@ -33,6 +33,8 @@ namespace Assets.Scripts.Data
         private void SpawnTokenHelper(RepetitionTimer t)
         {
             if (!HasToken()) SpawnToken(TokenSpawner.instance.GetToken());
+            else spawnItem.gameObject.SetActive(false);
+            
         }
 
         /// <summary>

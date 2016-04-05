@@ -138,7 +138,6 @@ namespace Assets.Scripts.Data
                 FileStream file = File.Open(settingsDataPath + extension, FileMode.Open);
 
                 data = (GameSettings)bf.Deserialize(file);
-
                 file.Close();
 
                 return data;
@@ -162,94 +161,100 @@ namespace Assets.Scripts.Data
             GameSettings data = new GameSettings();
 
             TextAsset xmlFile = (TextAsset)Resources.Load(xmlSettingsDataPath + extension);
-            MemoryStream assetStream = new MemoryStream(xmlFile.bytes);
-            XmlReader reader = XmlReader.Create(assetStream);
+			Debug.Log(xmlFile);
+			if(xmlFile != null) {
+	            MemoryStream assetStream = new MemoryStream(xmlFile.bytes);
+	            XmlReader reader = XmlReader.Create(assetStream);
 
-            bool endofSettings = false;
-            while (reader.Read() && !endofSettings)
-            {
-                if (reader.IsStartElement())
-                {
-                    switch (reader.LocalName)
-                    {
-                        case "Type":
-                            data.Type = (Enums.GameType)System.Enum.Parse(typeof(Enums.GameType), reader.ReadElementContentAsString());
-                            break;
-                        case "TimeLimitEnabled":
-                            data.TimeLimitEnabled = reader.ReadElementContentAsBoolean();
-                            break;
-                        case "TimeLimit":
-                            data.TimeLimit = reader.ReadElementContentAsFloat();
-                            break;
-                        case "KillLimit":
-                            data.KillLimit = reader.ReadElementContentAsFloat();
-                            break;
-                        case "StockLimit":
-                            data.StockLimit = reader.ReadElementContentAsFloat();
-                            break;
-                        case "ArrowLimit":
-                            data.ArrowLimit = reader.ReadElementContentAsFloat();
-                            break;
-                        case "DamageModifier":
-                            data.DamageModifier = reader.ReadElementContentAsFloat();
-                            break;
-                        case "GravityModifier":
-                            data.GravityModifier = reader.ReadElementContentAsFloat();
-                            break;
-                        case "SpeedModifier":
-                            data.SpeedModifier = reader.ReadElementContentAsFloat();
-                            break;
-                        case "TokenSpawnFreq":
-                            data.TokenSpawnFreq = reader.ReadElementContentAsFloat();
-                            break;
-                        case "PlayerSpawnFreq":
-                            data.PlayerSpawnFreq = reader.ReadElementContentAsFloat();
-                            break;
-                        case "EnabledTokens":
-                            Dictionary<Enums.Tokens, Enums.Frequency> dict = new Dictionary<Enums.Tokens, Enums.Frequency>();
-                            XmlReader inner = reader.ReadSubtree();
-                            while (inner.Read())
-                            {
-                                if (inner.IsStartElement())
-                                {
-                                    if (inner.LocalName.Equals("Token"))
-                                    {
-                                        Enums.Tokens t = (Enums.Tokens)System.Enum.Parse(typeof(Enums.Tokens), inner.ReadElementContentAsString());
-                                        inner.ReadToFollowing("Frequency");
-                                        Enums.Frequency f = (Enums.Frequency)System.Enum.Parse(typeof(Enums.Frequency), inner.ReadElementContentAsString());
-                                        dict.Add(t, f);
-                                    }
-                                }
-                            }
-                            data.EnabledTokens = dict;
-                            inner.Close();
-                            break;
-                        case "DefaultTokens":
-                            List<Enums.Tokens> defaultTokens = new List<Enums.Tokens>();
-                            XmlReader tokens = reader.ReadSubtree();
-                            while (tokens.Read())
-                            {
-                                if (tokens.IsStartElement())
-                                {
-                                    if (tokens.LocalName.Equals("Token"))
-                                    {
-                                        Enums.Tokens t = (Enums.Tokens)System.Enum.Parse(typeof(Enums.Tokens), tokens.ReadElementContentAsString());
-                                        defaultTokens.Add(t);
-                                    }
-                                }
-                            }
-                            data.DefaultTokens = defaultTokens;
-                            tokens.Close();
-                            break;
-                        case "GameSettings":
-                            break;
-                        default:
-                            endofSettings = true;
-                            break;
-                    }
-                }
-            }
-            reader.Close();
+	            bool endofSettings = false;
+	            while (reader.Read() && !endofSettings)
+	            {
+	                if (reader.IsStartElement())
+	                {
+	                    switch (reader.LocalName)
+	                    {
+	                        case "Type":
+	                            data.Type = (Enums.GameType)System.Enum.Parse(typeof(Enums.GameType), reader.ReadElementContentAsString());
+	                            break;
+							case "Variant":
+								data.Variant = (Enums.GameVariant)System.Enum.Parse(typeof(Enums.GameVariant), reader.ReadElementContentAsString());
+								break;
+	                        case "TimeLimitEnabled":
+	                            data.TimeLimitEnabled = reader.ReadElementContentAsBoolean();
+	                            break;
+	                        case "TimeLimit":
+	                            data.TimeLimit = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "KillLimit":
+	                            data.KillLimit = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "StockLimit":
+	                            data.StockLimit = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "ArrowLimit":
+	                            data.ArrowLimit = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "DamageModifier":
+	                            data.DamageModifier = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "GravityModifier":
+	                            data.GravityModifier = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "SpeedModifier":
+	                            data.SpeedModifier = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "TokenSpawnFreq":
+	                            data.TokenSpawnFreq = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "PlayerSpawnFreq":
+	                            data.PlayerSpawnFreq = reader.ReadElementContentAsFloat();
+	                            break;
+	                        case "EnabledTokens":
+	                            Dictionary<Enums.Tokens, Enums.Frequency> dict = new Dictionary<Enums.Tokens, Enums.Frequency>();
+	                            XmlReader inner = reader.ReadSubtree();
+	                            while (inner.Read())
+	                            {
+	                                if (inner.IsStartElement())
+	                                {
+	                                    if (inner.LocalName.Equals("Token"))
+	                                    {
+	                                        Enums.Tokens t = (Enums.Tokens)System.Enum.Parse(typeof(Enums.Tokens), inner.ReadElementContentAsString());
+	                                        inner.ReadToFollowing("Frequency");
+	                                        Enums.Frequency f = (Enums.Frequency)System.Enum.Parse(typeof(Enums.Frequency), inner.ReadElementContentAsString());
+	                                        dict.Add(t, f);
+	                                    }
+	                                }
+	                            }
+	                            data.EnabledTokens = dict;
+	                            inner.Close();
+	                            break;
+	                        case "DefaultTokens":
+	                            List<Enums.Tokens> defaultTokens = new List<Enums.Tokens>();
+	                            XmlReader tokens = reader.ReadSubtree();
+	                            while (tokens.Read())
+	                            {
+	                                if (tokens.IsStartElement())
+	                                {
+	                                    if (tokens.LocalName.Equals("Token"))
+	                                    {
+	                                        Enums.Tokens t = (Enums.Tokens)System.Enum.Parse(typeof(Enums.Tokens), tokens.ReadElementContentAsString());
+	                                        defaultTokens.Add(t);
+	                                    }
+	                                }
+	                            }
+	                            data.DefaultTokens = defaultTokens;
+	                            tokens.Close();
+	                            break;
+	                        case "GameSettings":
+	                            break;
+	                        default:
+	                            endofSettings = true;
+	                            break;
+	                    }
+	                }
+	            }
+	            reader.Close();
+			}
             return data;
         }
 
@@ -262,7 +267,7 @@ namespace Assets.Scripts.Data
         {
             // Get a default settings in case none exists
             TargetSettings data = new TargetSettings();
-
+            Debug.Log(xmlSettingsDataPath + extension);
             TextAsset xmlFile = (TextAsset)Resources.Load(xmlSettingsDataPath + extension);
             MemoryStream assetStream = new MemoryStream(xmlFile.bytes);
             XmlReader reader = XmlReader.Create(assetStream);

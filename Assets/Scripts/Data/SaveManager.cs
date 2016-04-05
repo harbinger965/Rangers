@@ -20,7 +20,7 @@ namespace Assets.Scripts.Data
 		{
 			if(instance == null)
 			{
-				DontDestroyOnLoad(gameObject);
+//				DontDestroyOnLoad(this);
 				instance = this;
 			}
 			else if(instance != this)
@@ -86,6 +86,12 @@ namespace Assets.Scripts.Data
 
             bf.Serialize(file, data);
             file.Close();
+
+			bf = new BinaryFormatter();
+			file = File.Open(settingsDataPath + extension, FileMode.Open);
+
+			data = (GameSettings)bf.Deserialize(file);
+			file.Close();
         }
     }
 }

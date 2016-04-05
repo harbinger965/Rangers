@@ -16,14 +16,27 @@ public class ProfileManager : MonoBehaviour {
 			Destroy(this);
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 	public void AddProfile(ProfileData data, PlayerID id = PlayerID.One) {
 		loadedProfiles.Add(id,data);
+	}
+
+	/// <summary>
+	/// Removes the profile with the specified player ID.
+	/// </summary>
+	/// <param name="id">The ID of the player to remove.</param>
+	public void RemoveProfile(PlayerID id) {
+		loadedProfiles.Remove(id);
+		int numSignedIn = NumSignedIn();
+		if ((int)id <= numSignedIn) {
+			// Shift all players after the removed player back one place.
+			for (int i = (int)id + 1; i <= numSignedIn + 1; i++) {
+				PlayerID currentID = (PlayerID)i;
+				ProfileData data = GetProfile(currentID);
+				loadedProfiles.Remove(currentID);
+				AddProfile(data, (PlayerID)(i - 1));
+			}
+		}
 	}
 
 	public ProfileData GetProfile(PlayerID id) {
@@ -33,4 +46,9 @@ public class ProfileManager : MonoBehaviour {
 	public bool ProfileExists(PlayerID id) {
 		return loadedProfiles.ContainsKey(id);
 	}
+
+    public int NumSignedIn()
+    {
+        return loadedProfiles.Count;
+    }
 }

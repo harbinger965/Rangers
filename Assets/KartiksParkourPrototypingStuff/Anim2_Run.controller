@@ -204,7 +204,7 @@ AnimatorStateTransition:
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.1
-  m_TransitionOffset: 0
+  m_TransitionOffset: 0.2
   m_ExitTime: 0.9
   m_HasExitTime: 0
   m_HasFixedDuration: 0
@@ -510,7 +510,7 @@ AnimatorStateTransition:
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.1
-  m_TransitionOffset: 0
+  m_TransitionOffset: 0.2
   m_ExitTime: 0.9
   m_HasExitTime: 0
   m_HasFixedDuration: 0
@@ -886,7 +886,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 20697618}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -935,7 +935,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 7400002, guid: 7219b3526796e4e0da98953100e6e8f2, type: 3}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -959,7 +959,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 375cc0494b0a44624a2e2670b66c10bf, type: 3}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -1057,7 +1057,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 7219b3526796e4e0da98953100e6e8f2, type: 3}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -1081,7 +1081,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 7400004, guid: 7219b3526796e4e0da98953100e6e8f2, type: 3}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -1179,7 +1179,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 556a439b4f77f42a58e5681e04bfa5d7, type: 3}
-  m_Tag: 
+  m_Tag: Left
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 

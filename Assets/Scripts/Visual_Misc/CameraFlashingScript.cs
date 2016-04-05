@@ -20,7 +20,6 @@ public class CameraFlashingScript : MonoBehaviour
 	void Update ()
 	{
 		flashTimer -= Time.deltaTime;
-//		Debug.Log();
 		if(flashTimer <= 0) {
 			for(int i = 0; i < actualNumFlash; i++) 
 			{

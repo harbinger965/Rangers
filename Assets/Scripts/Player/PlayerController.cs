@@ -11,18 +11,22 @@ namespace Assets.Scripts.Player
 		//has the player drawn the bow back, and is ready to fire?
 		private bool fire;
 
+		//should we play the drawArrow sound effect?
+		private bool drawnArrow;
+
 		//did the joystick overshoot the deadzone, triggering a fire?
 		private bool definitelyFire;
 
 		//used to help check for overshooting the joystick deadzone
-		Vector3 prevAim = Vector3.zero;
+		//Vector3 prevAim = Vector3.zero;
 
 		//locking the maximum fire rate for anyone spamming the joystick or any accidental input
 		private const float MAX_FIRE_RATE = 0.5f;
 		private float fireRateTimer = 0;
 
-        void Update()
+        private new void Update()
         {
+			base.Update();
 			//updating fireRateTimer
 			fireRateTimer += Time.deltaTime;
 
@@ -36,18 +40,23 @@ namespace Assets.Scripts.Player
 
 				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,id)) parkour.Jump();
 				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B,id)) parkour.SlideOn();
-				else parkour.SlideOff();
+                if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
+                else parkour.SlideOff();
 
 				if(Vector3.Magnitude(aim) > 1.2f)
 	            {
 					//if the joystick is pushed past the 50% mark in any direction, start aiming the bow
 					archery.UpdateFirePoint(Vector3.Normalize(aim));
 	                fire = true;
+					if(!drawnArrow) {
+						SFXManager.instance.PlayArrowPull();
+						drawnArrow = true;
+					}
 				} else if (fireRateTimer > MAX_FIRE_RATE && fire)
 				{
+					drawnArrow = false;
 					archery.Fire();
 					fire = false;
-					//				definitelyFire = false;
 					fireRateTimer = 0;
 				}
 				else
@@ -56,7 +65,6 @@ namespace Assets.Scripts.Player
 					archery.AimUpperBodyWithLegs();
 				}
 			}
-
             //if (invincibleFrames > 0) invincibleFrames--;
         }
 
@@ -67,6 +75,14 @@ namespace Assets.Scripts.Player
 			{
 				parkour.Locomote(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id));
 			}
+		}
+
+		/// <summary>
+		/// Checks if the controller is holding the jump button.
+		/// </summary>
+		/// <returns>Whether the controller is holding the jump button.</returns>
+		internal override bool IsHoldingJump() {
+			return ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
 		}
     }
 }

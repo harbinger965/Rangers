@@ -22,37 +22,29 @@ public class Rotating : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-	
+		pauseTimer = pause;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if(pause > 0f) 
+		if(pauseTimer > 0f) 
 		{
 			pauseTimer -= Time.deltaTime;
-			if(pauseTimer <= 0 && isPaused) 
-			{
-				pauseTimer = pause;
-				isPaused = !isPaused;
-			} 
-			else if(pauseTimer <= 0 && !isPaused) 
-			{
-				pauseTimer = pause;
-				isPaused = !isPaused;
-			}
 		}
-		if(!isPaused) 
+		else
 		{
 			if(rotationAxis == Axis.X) 
 			{
 				if(worldSpace) 
 				{
 					transform.Rotate(new Vector3(speed, 0f, 0f), Space.World);
+					if(transform.eulerAngles.x == 0) pauseTimer = pause;
 				} 
 				else 
 				{
 					transform.Rotate(new Vector3(speed, 0f, 0f), Space.Self);
+					if(transform.localEulerAngles.x == 0) pauseTimer = pause;
 				}
 			} 
 			else if(rotationAxis == Axis.Y)
@@ -60,10 +52,12 @@ public class Rotating : MonoBehaviour
 				if(worldSpace)
 				{
 					transform.Rotate(new Vector3(0f, speed, 0f), Space.World);
+					if(transform.eulerAngles.y == 0) pauseTimer = pause;
 				}
 				else
 				{
 					transform.Rotate(new Vector3(0f, speed, 0f), Space.Self);
+					if(transform.localEulerAngles.y == 0) pauseTimer = pause;
 				}
 			} 
 			else if(rotationAxis == Axis.Z) 
@@ -71,10 +65,12 @@ public class Rotating : MonoBehaviour
 				if(worldSpace)
 				{
 					transform.Rotate(new Vector3(0f, 0f, speed), Space.World);
+					if(transform.eulerAngles.z == 0) pauseTimer = pause;
 				} 
 				else 
 				{
 					transform.Rotate(new Vector3(0f, 0f, speed), Space.Self);
+					if(transform.localEulerAngles.z == 0) pauseTimer = pause;
 				}
 			}
 		}

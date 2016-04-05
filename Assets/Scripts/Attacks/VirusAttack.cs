@@ -36,9 +36,9 @@ namespace Assets.Scripts.Attacks
 			lights = new Dictionary<Enums.Arrows, GameObject>();
 			for(int i = 1; i < (int) Enums.Arrows.NumTypes; i++)
 			{
-				if(Util.Bitwise.IsBitOn(hitController.ArcheryComponent.ArrowTypes, i))
+				if(Bitwise.IsBitOn(hitController.ArcheryComponent.ArrowTypes, i))
 				{
-					hitController.ArcheryComponent.RemoveArrowType((Enums.Arrows) i);
+					//hitController.ArcheryComponent.RemoveArrowType((Enums.Arrows) i);
 
 					GameObject light;
 					if(lights.Count > transform.childCount)
@@ -61,6 +61,8 @@ namespace Assets.Scripts.Attacks
 					lights.Add((Enums.Arrows) i, light);
 				}
 			}
+
+            hitController.ArcheryComponent.ArrowTypes = hitController.ArcheryComponent.PermanentArrowTypes;
 				
 			if(lights.Count == 0) 
 			{

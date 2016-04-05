@@ -25,6 +25,8 @@ public class GameSettings
     private bool timeLimitEnabled;
     // What type of game is running
     private Enums.GameType type;
+	// What type of variant does this gametype have
+	private Enums.GameVariant variant;
     // Dictionary of enabled tokns and their frequencies that they spawn
     private Dictionary<Enums.Tokens, Enums.Frequency> enabledTokens;
     // The token effects that are initialized by default that can't be turned off
@@ -37,6 +39,7 @@ public class GameSettings
     public GameSettings()
     {
         type = Enums.GameType.Stock;
+		variant = Enums.GameVariant.None;
         timeLimit = Mathf.Infinity;
         killLimit = Mathf.Infinity;
         stockLimit = DEFAULT_STOCK;
@@ -51,7 +54,7 @@ public class GameSettings
         enabledTokens = new Dictionary<Enums.Tokens, Enums.Frequency>();
         for(int i = 0; i < (int)Enums.Tokens.NumTypes; i++)
         {
-            enabledTokens.Add((Enums.Tokens)i, Enums.Frequency.Abundant);
+            enabledTokens.Add((Enums.Tokens)i, Enums.Frequency.Infrequent);
         }
         defaultTokens = new List<Enums.Tokens>();
 }
@@ -61,7 +64,7 @@ public class GameSettings
     /// </summary>
     public void UpdateKillSettings()
     {
-        type = Enums.GameType.Kills;
+        type = Enums.GameType.Deathmatch;
         killLimit = DEFAULT_KILLS;
         stockLimit = Mathf.Infinity;
     }
@@ -78,12 +81,21 @@ public class GameSettings
 
     #region C# Properties
     /// <summary>
-    /// The amount of time that can pass before the game ends
+    /// Gets or sets the time limit. When setting the time limit to anything greater than zero,
+	/// sets the timelimit enabled bool to true
     /// </summary>
+    /// <value>The time limit.</value>
     public float TimeLimit
     {
         get { return timeLimit; }
-        set { timeLimit = value; }
+        set {
+			if(timeLimit > 0) {
+				TimeLimitEnabled = true;
+			} else {
+				TimeLimitEnabled = false;
+			}
+			timeLimit = value;
+		}
     }
     /// <summary>
     /// The number of kill one player can reach before the game ends
@@ -91,7 +103,12 @@ public class GameSettings
     public float KillLimit
     {
         get { return killLimit; }
-        set { killLimit = value; }
+        set {
+			if(value == 0)
+				killLimit = Mathf.Infinity;
+			else
+				killLimit = value;
+		}
     }
     /// <summary>
     /// The amount of lives each player starts with
@@ -99,7 +116,12 @@ public class GameSettings
     public float StockLimit
     {
         get { return stockLimit; }
-        set { stockLimit = value; }
+		set {
+			if(value == 0)
+				stockLimit = Mathf.Infinity;
+			else
+				stockLimit = value;
+		}
     }
     /// <summary>
     /// The number of arrows each player starts with
@@ -171,8 +193,18 @@ public class GameSettings
     public Enums.GameType Type
     {
         get { return type; }
-        set { type = value; }
+		set { type = value; }
     }
+
+	/// <summary>
+	/// The current game type
+	/// </summary>
+	public Enums.GameVariant Variant
+	{
+		get { return variant; }
+		set { variant = value; }
+	}
+
     /// <summary>
     /// The dictionary of active tokens and their spawn frequencies
     /// </summary>

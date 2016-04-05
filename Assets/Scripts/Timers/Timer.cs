@@ -107,6 +107,14 @@ namespace Assets.Scripts.Timers
         #endregion
 
         /// <summary>
+        /// Whether or not the timer is on and running
+        /// </summary>
+        public bool On
+        {
+            get { return on; }
+            set { on = value; }
+        }
+        /// <summary>
         /// String representation of the timer
         /// </summary>
         /// <returns>The time as a string</returns>

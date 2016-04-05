@@ -6,44 +6,24 @@ namespace Assets.Scripts.Attacks
 {
     public class ZeroGravityAttack : GravityAttack
     {
-        protected override void HandleTriggerEnter(Collider col)
+        protected override void Affect(GameObject g)
         {
-            Rigidbody rigidbody = col.transform.root.GetComponent<Rigidbody>();
-            if(rigidbody)
-            {
-                rigidbody.useGravity = false;
-            }
-        }
-
-        protected override void HandleTriggerStay(Collider col)
-        {
-            Rigidbody rigidbody = col.transform.root.GetComponent<Rigidbody>();
+            Rigidbody rigidbody = g.transform.root.GetComponent<Rigidbody>();
             if (rigidbody)
             {
                 rigidbody.useGravity = false;
             }
         }
 
-        protected override void HandleTriggerExit(Collider col)
+        protected override void Unaffect(GameObject g)
         {
-            Rigidbody rigidbody = col.transform.root.GetComponent<Rigidbody>();
+			if (g == null) {
+				return;
+			}
+            Rigidbody rigidbody = g.transform.root.GetComponent<Rigidbody>();
             if (rigidbody)
             {
                 rigidbody.useGravity = true;
-            }
-        }
-
-        protected override void Final(Timer t)
-        {
-            Collider[] cols = Physics.OverlapSphere(transform.position, GetComponent<SphereCollider>().radius);
-            foreach (Collider col in cols)
-            {
-                Rigidbody rigidbody = col.transform.root.GetComponent<Rigidbody>();
-                if (rigidbody)
-                {
-                    rigidbody.useGravity = true;
-                }
-                Destroy(gameObject);
             }
         }
     }

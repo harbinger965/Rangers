@@ -16,9 +16,11 @@ namespace Assets.Scripts.Tokens
         /// Override the TokenCollected method and tell the Life component to collect the token
         /// </summary>
         /// <param name="controller">Controller that is collecting the token</param>
-        protected override void TokenCollected(Controller controller)
+        public override void TokenCollected(Controller controller)
         {
             controller.LifeComponent.CollectToken(this);
+            // Set inactive since we are pooling
+            gameObject.SetActive(false);
         }
 
         #region C# Properties

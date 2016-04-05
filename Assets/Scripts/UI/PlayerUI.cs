@@ -10,12 +10,19 @@ public class PlayerUI : MonoBehaviour
 	private Image healthBar, strengthBar;
 	private Controller playerRef;
 
+	/// <summary> The panel displaying the player's health. </summary>
+	private Transform healthPanel;
+	/// <summary> The panel displaying the player's arrow strength. </summary>
+	private Transform strengthPanel;
+
 	// Use this for initialization
 	void Start () 
 	{
 		playerRef = transform.root.GetComponent<Controller>();
-		healthBar = transform.FindChild("HealthPanel").FindChild("Overlay").GetComponent<Image>();
-		strengthBar = transform.FindChild("StrengthPanel").FindChild("Overlay").GetComponent<Image>();
+		healthPanel = transform.FindChild("HealthPanel");
+		strengthPanel = transform.FindChild("StrengthPanel");
+		healthBar = healthPanel.FindChild("Overlay").GetComponent<Image>();
+		strengthBar = strengthPanel.FindChild("Overlay").GetComponent<Image>();
 	}
 	
 	// Update is called once per frame
@@ -30,12 +37,15 @@ public class PlayerUI : MonoBehaviour
 		if(playerRef.ArcheryComponent.UpperBodyFacingRight && !Mathf.Approximately(transform.localEulerAngles.y,270f))
 		{
 			GetComponent<RectTransform>().localRotation = Quaternion.RotateTowards(GetComponent<RectTransform>().localRotation,
-				Quaternion.Euler(new Vector3(0f,270f,0f)), Time.deltaTime*360f);
+				Quaternion.Euler(new Vector3(0f,270f,0f)), Time.deltaTime*720f);
 		} 
 		else if(!playerRef.ArcheryComponent.UpperBodyFacingRight && !Mathf.Approximately(transform.localEulerAngles.y,90f)) 
 		{
 			GetComponent<RectTransform>().localRotation = Quaternion.RotateTowards(GetComponent<RectTransform>().localRotation,
-				Quaternion.Euler(new Vector3(0f,90f,0f)), Time.deltaTime*360f);
+				Quaternion.Euler(new Vector3(0f,90f,0f)), Time.deltaTime*720f);
 		}
+		bool alive = playerRef.LifeComponent.Health > 0;
+		healthPanel.gameObject.SetActive(alive);
+		strengthPanel.gameObject.SetActive(alive);
 	}
 }

@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 using Assets.Scripts.Data;
 using Assets.Scripts.Util;
 using Assets.Scripts.UI.Profiles;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.UI
 {
@@ -11,25 +13,42 @@ namespace Assets.Scripts.UI
         public static MenuManager instance;
 
         public static Enums.UIStates state = Enums.UIStates.Splash;
+		private Enums.UIStates prevState = Enums.UIStates.None;
 
-        private float hTimer, vTimer, delay = 0.1f;
+		/// <summary> The last object that was selected before the Navigator was set to uninteractable. </summary>
+		private GameObject prevSelected;
+
+        private float hTimer, vTimer, delay = 0.3f;
 
         private Transform activePanel;
+		private Transform prevPanel;
 
         private bool dpadPressed;
 
+		private ValueModifierUI currentValueMod;
+
+		public GameObject menuTitle;
+
         [SerializeField]
-        private Transform SplashPanel, MainPanel, SignInPanel, SinglePanel, MultiPanel, SettingPanel, AudioPanel, VideoPanel, PlayerPanel;
+		private Transform SplashPanel = null, MainPanel = null, SignInPanel = null, LevelSelectPanel = null, SinglePanel = null, MultiPanel = null, SettingPanel = null, AudioPanel = null, VideoPanel = null, PlayerPanel = null, ArenaStandardPanel = null;
+
+		[SerializeField]
+		private Transform TargetLevelSelectPanel = null;
+
+		/// <summary> The panel displaying player names. </summary>
+		[SerializeField]
+		[Tooltip("The panel displaying player names.")]
+		private MainMenuPlayerTabsController TabsPanel = null;
 
         
         void Awake()
         {
             if(instance == null)
             {
-                DontDestroyOnLoad(gameObject);
+//                DontDestroyOnLoad(gameObject);
                 instance = this;
                 UpdatePanels(SplashPanel);
-				ControllerManager manager = new ControllerManager();
+				//ControllerManager manager = new ControllerManager();
             }
             else if (instance != this)
             {
@@ -65,6 +84,18 @@ namespace Assets.Scripts.UI
                 case Enums.UIStates.Video:
                     Video();
                     break;
+				case Enums.UIStates.ArenaStandard:
+					ArenaStandardMatch();
+					break;
+				case Enums.UIStates.ValueModifier:
+					ValueModifier();
+					break;
+				case Enums.UIStates.LevelSelect:
+					LevelSelect();
+					break;
+				case Enums.UIStates.TargetLevelSelect:
+					TargetLevelSelect();
+					break;
                 case Enums.UIStates.None:
                     break;
             }
@@ -84,6 +115,7 @@ namespace Assets.Scripts.UI
 //                {
 					state = Enums.UIStates.Signin;
 					UpdatePanels(SignInPanel);
+				SFXManager.instance.PlayAffirm();
 //                }
             }
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
@@ -103,14 +135,17 @@ namespace Assets.Scripts.UI
 			{
 				state = Enums.UIStates.Splash;
 				UpdatePanels(SplashPanel);
+				SFXManager.instance.PlayNegative();
+				ControllerManager.instance.AllowPlayerRemoval(ControllerInputWrapper.Buttons.B);
 			}
 			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start, PlayerID.One))
 			{
 				string text = SignInPanel.FindChild("NameCreator").FindChild("LetterHolder").GetComponent<NameCreator>().t.text;
-				if(text.Length == 4) {
+				if(text.Length > 0 && text.ToCharArray()[text.Length-1] != ' ') {
 					ProfileData pd = new ProfileData(text);
 					ProfileManager.instance.AddProfile(pd);
 					SignInToMain();
+					SFXManager.instance.PlayAffirm();
 				}
 			}
 		}
@@ -122,6 +157,7 @@ namespace Assets.Scripts.UI
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
+				SFXManager.instance.PlayNegative();
             }
         }
 
@@ -132,8 +168,20 @@ namespace Assets.Scripts.UI
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
+				SFXManager.instance.PlayNegative();
             }
         }
+
+		private void ArenaStandardMatch()
+		{
+			Navigate();
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			{
+				state = Enums.UIStates.Main;
+				UpdatePanels(MainPanel);
+				SFXManager.instance.PlayNegative();
+			}
+		}
 
         private void Settings()
         {
@@ -142,6 +190,7 @@ namespace Assets.Scripts.UI
             {
                 state = Enums.UIStates.Main;
                 UpdatePanels(MainPanel);
+				SFXManager.instance.PlayNegative();
             }
         }
 
@@ -152,6 +201,7 @@ namespace Assets.Scripts.UI
             {
                 state = Enums.UIStates.Settings;
                 UpdatePanels(SettingPanel);
+				SFXManager.instance.PlayNegative();
             }
         }
 
@@ -162,8 +212,79 @@ namespace Assets.Scripts.UI
             {
                 state = Enums.UIStates.Settings;
                 UpdatePanels(SettingPanel);
+				SFXManager.instance.PlayNegative();
             }
         }
+
+		private void LevelSelect() {
+			Navigate();
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			{
+				state = prevState;
+				UpdatePanels(prevPanel);
+				SFXManager.instance.PlayNegative();
+			}
+		}
+
+		private void TargetLevelSelect() {
+			Navigate();
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
+			{
+				state = Enums.UIStates.Main;
+				UpdatePanels(MainPanel);
+				SFXManager.instance.PlayNegative();
+			}
+		}
+
+		public void GoToGame(MapSelector selection) {
+			string selectedMap = selection.arenaSelector ? ((Enums.BattleStages)selection.currentSelectedMap).ToString() : ((Enums.TargetPracticeStages)selection.currentSelectedMap).ToString();
+			if(ProfileManager.instance.NumSignedIn() > 1) SceneManager.LoadScene(selectedMap, LoadSceneMode.Single);
+		}
+
+		private void ValueModifier() {
+			if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY, PlayerID.One) > ControllerManager.CUSTOM_DEADZONE
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadY, PlayerID.One) > 0
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, PlayerID.One) > ControllerManager.CUSTOM_DEADZONE
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, PlayerID.One) > 0) {
+				if (vTimer >= delay || vTimer == 0)
+				{
+					currentValueMod.IncrementValue();
+					vTimer = 0;
+					SFXManager.instance.PlayClick();
+				}
+				vTimer += Time.deltaTime;
+			} else if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY, PlayerID.One) < -ControllerManager.CUSTOM_DEADZONE
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadY, PlayerID.One) < 0
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, PlayerID.One) < -ControllerManager.CUSTOM_DEADZONE
+				|| ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, PlayerID.One) < 0) {
+				if (vTimer >= delay || vTimer == 0)
+				{
+					currentValueMod.DecrementValue();
+					vTimer = 0;
+					SFXManager.instance.PlayClick();
+				}
+				vTimer += Time.deltaTime;
+			} else {
+				vTimer = 0;
+			}
+
+			if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One)
+				|| ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.A, PlayerID.One))
+			{
+				state = prevState;
+				currentValueMod.GetComponent<Selectable>().interactable = true;
+				Navigator.CallCancel();
+				EventSystem.current.SetSelectedGameObject(prevSelected);
+			}
+		}
+
+		public void ValueModifierEntered(ValueModifierUI val) {
+			prevState = state;
+			prevSelected = EventSystem.current.currentSelectedGameObject;
+			state = Enums.UIStates.ValueModifier;
+			currentValueMod = val;
+			currentValueMod.GetComponent<Selectable>().interactable = false;
+		}
 
         private void None()
         {
@@ -180,10 +301,15 @@ namespace Assets.Scripts.UI
             SettingPanel.gameObject.SetActive(false);
             AudioPanel.gameObject.SetActive(false);
             VideoPanel.gameObject.SetActive(false);
+			ArenaStandardPanel.gameObject.SetActive(false);
         }
 
         private void Navigate()
         {
+			if (PlayerOneChoosingName())
+			{
+				return;
+			}
             // No axis is being pressed
 			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) == 0)
             {
@@ -192,10 +318,10 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held right
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) > 0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) > ControllerManager.CUSTOM_DEADZONE)
             {
                 // If we can move and it is time to move
-                if (hTimer >= delay || hTimer == 0)
+                if (hTimer >= delay)
                 {
                     // Move and reset timer
                     Navigator.Navigate(Enums.MenuDirections.Right);
@@ -205,10 +331,10 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held left
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) < -0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) < -ControllerManager.CUSTOM_DEADZONE)
             {
                 // If we can move and it is time to move
-                if (hTimer >= delay || hTimer == 0)
+                if (hTimer >= delay)
                 {
                     // Move and reset timer
                     Navigator.Navigate(Enums.MenuDirections.Left);
@@ -225,10 +351,10 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held right
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) > 0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) > ControllerManager.CUSTOM_DEADZONE)
             {
                 // If we can move and it is time to move
-                if (vTimer >= delay || vTimer == 0)
+                if (vTimer >= delay)
                 {
                     // Move and reset timer
                     Navigator.Navigate(Enums.MenuDirections.Up);
@@ -238,10 +364,10 @@ namespace Assets.Scripts.UI
             }
             // Horizontal joystick is held left
             // Use > 0.5f so that sensitivity is not too high
-			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) < -0.5f)
+			else if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,PlayerID.One) < -ControllerManager.CUSTOM_DEADZONE)
             {
                 // If we can move and it is time to move
-                if (vTimer >= delay || vTimer == 0)
+                if (vTimer >= delay)
                 {
                     // Move and reset timer
                     Navigator.Navigate(Enums.MenuDirections.Down);
@@ -252,7 +378,7 @@ namespace Assets.Scripts.UI
 
             // Have dpad functionality so that player can have precise control and joystick quick navigation
             // Check differently for Windows vs OSX
-
+            
             // No dpad button is pressed
 			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX,PlayerID.One) == 0 && (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadY,PlayerID.One) == 0)) dpadPressed = false;
             // Dpad right is pressed; treating as DPADRightOnDown
@@ -289,7 +415,8 @@ namespace Assets.Scripts.UI
 			state = Enums.UIStates.Main;
 			UpdatePanels(MainPanel);
 			PlayerPanel.gameObject.SetActive(true);
-			PlayerPanel.SetAsLastSibling();
+			PlayerPanel.SetAsFirstSibling();
+			menuTitle.SetActive(true);
 		}
 
         public void CallSinglePlayer()
@@ -297,6 +424,16 @@ namespace Assets.Scripts.UI
             state = Enums.UIStates.SinglePlayer;
             UpdatePanels(SinglePanel);
         }
+
+		public void CallLevelSelect(MatchDesigner match)
+		{
+			GameSettings settings = match.GetSettings();
+			SaveManager.SaveGameSettings(settings,"Current.dat");
+			prevState = state;
+			prevPanel = activePanel;
+			state = Enums.UIStates.LevelSelect;
+			UpdatePanels(LevelSelectPanel);
+		}
 
 		public void CallMain()
 		{
@@ -316,6 +453,14 @@ namespace Assets.Scripts.UI
             UpdatePanels(SettingPanel);
         }
 
+		public void CallSplash()
+		{
+			state = Enums.UIStates.Splash;
+			PlayerPanel.gameObject.SetActive(false);
+			menuTitle.SetActive(false);
+			UpdatePanels(SplashPanel);
+		}
+
         public void CallAudio()
         {
             state = Enums.UIStates.Audio;
@@ -327,6 +472,18 @@ namespace Assets.Scripts.UI
             state = Enums.UIStates.Video;
             UpdatePanels(VideoPanel);
         }
+
+		public void CallArenaStandard()
+		{
+			state = Enums.UIStates.ArenaStandard;
+			UpdatePanels(ArenaStandardPanel);
+		}
+
+		public void CallTargetLevelSelect()
+		{
+			state = Enums.UIStates.TargetLevelSelect;
+			UpdatePanels(TargetLevelSelectPanel);
+		}
 
         public void ExitGame()
         {
@@ -341,7 +498,7 @@ namespace Assets.Scripts.UI
                 panel.SetAsLastSibling();
             }
             GameObject defaultButton = panel.GetComponent<MenuOption>().DefaultButton;
-            if (defaultButton)
+            if (defaultButton != null && EventSystem.current !=  null)
             {
                 EventSystem.current.SetSelectedGameObject(defaultButton);
                 Navigator.defaultGameObject = defaultButton;
@@ -349,5 +506,15 @@ namespace Assets.Scripts.UI
 			if (activePanel) activePanel.gameObject.SetActive(false);
             activePanel = panel;
         }
-    } 
+
+		/// <summary>
+		/// Checks if player one is choosing a name.
+		/// </summary>
+		/// <returns>Whether player one is choosing a name.</returns>
+		private bool PlayerOneChoosingName()
+		{
+			MainMenuPlayerInfoBlock block = TabsPanel.GetBlock(0);
+			return block == null ? false : block.ChoosingName();
+		}
+    }
 }

@@ -20,13 +20,13 @@ public class TickerTextController : MonoBehaviour
 
 	private string nextString;
 
-	private float maxMovingTimer = 0.5f;
-	private float movingTimer;
+	//private float maxMovingTimer = 0.5f;
+	//private float movingTimer;
 
 	// Use this for initialization
 	void Start () 
 	{
-		movingTimer = maxMovingTimer;
+		//movingTimer = maxMovingTimer;
 		tickerText1 = transform.GetChild(0).GetComponent<Text>();
 		tickerText2 = transform.GetChild(1).GetComponent<Text>();
 		separatedNews = newsTicker.Split('#');

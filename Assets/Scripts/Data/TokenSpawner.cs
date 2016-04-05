@@ -58,7 +58,7 @@ namespace Assets.Scripts.Data
                         spawnToken.SetActive(false);
                     }
                 }
-                else Debug.Log("Key: " + key.ToString() + " is null");
+                //else Debug.Log("Key: " + key.ToString() + " is null");
             }
             // Initialize all the spawn points
             for (int i = 0; i < spawnPoints.Length; i++)

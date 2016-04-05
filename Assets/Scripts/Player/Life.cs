@@ -17,7 +17,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         public const float MAX_HEALTH = 100f;
 
-        private float health = MAX_HEALTH, lives = Mathf.Infinity;
+        private float health = MAX_HEALTH, lives = Mathf.Infinity, deaths = 0;
 
         // CHANGE FOR LATER
         public int kills;
@@ -32,26 +32,25 @@ namespace Assets.Scripts.Player
         /// <param name="id">The player who dealt the damage</param>
         public void ModifyHealth(float delta, PlayerID id = PlayerID.None)
         {
-            //if (controller.Invincible && delta < 0) return;
+			if(id != PlayerID.None) lastAttacker = id;
             if (health > 0)
             {
                 health = Mathf.Clamp((health + delta), 0, MAX_HEALTH);
-                Debug.Log("Health: " + health);
-                if (health <= 0) Die(id);
+				if (health <= 0) Die();
                 //controller.InvincibleFrames = Controller.INVINCIBLE_FRAMES;
             }
         }
 
         // Handles when players die
-        private void Die(PlayerID lastID = PlayerID.None)
-        {
-            lastAttacker = lastID;
+        private void Die()
+		{
+			SFXManager.instance.PlayDeath();
             controller.Disable();
             if (--lives > 0)
             {
-                Debug.Log("Lives: " + lives);
                 // Tell GameManager to setup respawn
                 GameManager.instance.Respawn(controller.ID);
+				deaths++;
             }
             GameManager.instance.PlayerKilled(controller.ID, lastAttacker);
         }
@@ -119,6 +118,11 @@ namespace Assets.Scripts.Player
             get { return lives; }
             set { lives = value; }
         }
+
+		public float Deaths
+		{
+			get { return deaths; }
+		}
         #endregion
     }
 }

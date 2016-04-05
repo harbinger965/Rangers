@@ -83,6 +83,7 @@ namespace Assets.Scripts.UI.Profiles
                     // Move and reset timer
                     Move(1);
                     timer = 0;
+					SFXManager.instance.PlayClick();
                 }
                 timer += Time.deltaTime;
             }
@@ -96,6 +97,7 @@ namespace Assets.Scripts.UI.Profiles
                     // Move and reset timer
                     Move(-1);
                     timer = 0;
+					SFXManager.instance.PlayClick();
                 }
                 timer += Time.deltaTime;
             }
@@ -104,6 +106,7 @@ namespace Assets.Scripts.UI.Profiles
             {
                 // Debug - add letter to overall string
                 t.text += capital ? characters[index].ToString() : characters[index].ToString().ToLower();
+				SFXManager.instance.PlayAffirm();
             }
             // Left joystick button is pressed
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.LeftStickClick, id))
@@ -136,12 +139,14 @@ namespace Assets.Scripts.UI.Profiles
             {
                 dpadPressed = true;
                 Move(1);
+				SFXManager.instance.PlayClick();
             }
             // Dpad right is pressed; treating as DPADLeftOnDown
 			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.DPadX, id) < 0 && !dpadPressed && index > 0)
             {
                 dpadPressed = true;
                 Move(-1);
+				SFXManager.instance.PlayClick();
             }
 
 			if(t.text.Length > 4) {

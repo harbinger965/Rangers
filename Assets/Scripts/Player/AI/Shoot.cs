@@ -11,23 +11,28 @@ namespace Assets.Scripts.Player.AI
 		/// <summary> Timer for delay between firing. </summary>
 		private float fireCooldown = 0;
 		/// <summary> The delay between firing. </summary>
-		private float cooldownTime = 5;
+		private float cooldownTime = 0;
 		/// <summary> The minimum power that the AI will shoot arrows at. </summary>
-		private float power;
+		private float minPower;
+		/// <summary> The minimum angle (in radians) that the AI will shoot arrows at. </summary>
+		private float minAngle;
 
-		/// <summary> Square root of 2. </summary>
-		private float ROOT2 = Mathf.Sqrt(2);
-		/// <summary> Square root of 2 over 2 (cos45, sin45) </summary>
-		private float ROOT22 = Mathf.Sqrt(2) / 2;
+		/// <summary> The opponent that the AI will target next. </summary>
+		internal Controller target;
+
+		/// <summary> Layer mask for raycasting platforms. </summary>
+		private const int LAYERMASK = 1 | 1 << 13;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Assets.Scripts.Player.AI.StandShoot"/> class.
 		/// </summary>
 		/// <param name="cooldownTime">The delay between firing.</param>
-		/// <param name="power">The minimum power that the AI will shoot arrows at.</param>
-		internal Shoot(float cooldownTime, float power) {
+		/// <param name="minPower">The minimum power that the AI will shoot arrows at.</param>
+		/// <param name="minAngle">The minimum angle (in radians) that the AI will shoot arrows at.</param> 
+		internal Shoot(float cooldownTime, float minPower, float minAngle) {
 			this.cooldownTime = cooldownTime;
-			this.power = power;
+			this.minPower = minPower;
+			this.minAngle = minAngle;
 		}
 
 		/// <summary>
@@ -36,57 +41,71 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="controller">The controller for the character.</param>
 		public void ChooseAction(AIController controller)
 		{
-			if (controller.opponent.LifeComponent.Health <= 0) {
-				controller.aiming = false;
+			if (target == null || target.LifeComponent.Health <= 0) {
+				controller.aiming = true;
 				return;
 			}
 
-			// Calculate the needed angle and strength to hit the opponent.
-			Vector3 distance = controller.opponent.transform.position - controller.transform.position;
-			float x = distance.x;
-			float y = distance.y;
-			float g = Physics.gravity.y;
-
-			// Minimum speed at 45 degrees.
-			float v = Mathf.Sqrt(x * x * g / (x + 2 * y * ROOT22 * ROOT22));
-			//Debug.Log(v);
-			float minStrength = (-4 + Mathf.Sqrt(8 + 160 * v)) / 80;
-			minStrength = Mathf.Sqrt(4 * minStrength * minStrength - minStrength * ROOT2 / 5 + 0.01f) / 2;
-			float strength = Mathf.Max(power, minStrength);
-			float angle = Mathf.PI / 4;
-
-			// Change angle if the required power is greater than the minimum.
-			/*
-			if (strength != minStrength)
+			Vector3 positionOffset = target.transform.position - controller.transform.position;
+			positionOffset.y += 0.25f;
+			bool left = false;
+			if (positionOffset.x < 0)
 			{
-				v = strength * 40 * (strength + 0.1f);
-				float v2 = v * v;
+				left = true;
+				positionOffset.x = -positionOffset.x;
+			}
 
-				float discriminant = v2 * v2 - g * (g * x * x - 2 * y * v2);
-				if (discriminant < 0)
+			float angle = Vector3.Angle(Vector3.right, positionOffset) * Mathf.PI / 180;
+			angle = Mathf.Max(angle, minAngle);
+
+			float x = positionOffset.x;
+			float y = positionOffset.y;
+			float g = -Physics.gravity.y;
+
+			// Find the minimum power for the required angle.
+			float v = Mathf.Sqrt((x * x * g) / (x * Mathf.Sin(2 * angle) - 2 * y * Mathf.Pow(Mathf.Cos(angle), 2)));
+			float power = (Mathf.Sqrt(10 * v + 1) - 1) / 20;
+
+			// If the minimum power is less than the required power, find the needed angle for the power.
+			if (power < minPower)
+			{
+				power = minPower;
+				v = 40 * power * (power + 0.1f);
+				float root = Mathf.Sqrt(Mathf.Pow(v, 4) - g * (g * x * x + 2 * y * v * v));
+				angle = Mathf.Atan((v * v - root) / (g * x));
+				if (angle < minAngle)
 				{
-					discriminant = 0;
+					angle = Mathf.Atan((v * v + root) / (g * x));
 				}
-				discriminant = 0;
-				angle = Mathf.Atan((v2 - Mathf.Sqrt(discriminant)) / (g * x));
-				Debug.Log(angle + " " + v + " " + x + " " + y);
-			}*/
+			}
+			power = Mathf.Min(power, 0.95f);
 
-			controller.aim = Quaternion.Euler(0, 0, angle * 180 / Mathf.PI) * Vector3.up;
+			if (left)
+			{
+				angle = Mathf.PI - angle;
+			}
 
-			//controller.aim = Vector3.Normalize(controller.opponent.transform.position - controller.transform.position);
+			controller.aim = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
+
+			// Keep the bow drawn without shooting if there isn't a clear shot.
+			RaycastHit hit;
+			if (!controller.HasClearShot(positionOffset, out hit)) {
+				controller.aiming = true;
+				return;
+			}
 
 			if (controller.aiming)
 			{
-				if (controller.ArcheryComponent.StrengthPercentage > strength - Time.deltaTime / 2f)
+				if (controller.ArcheryComponent.StrengthPercentage >= power)
 				{
-					Debug.Log(v);
+					controller.ArcheryComponent.StrengthPercentage = power;
 					controller.aiming = false;
 				}
 			}
 			else
 			{
-				if (fireCooldown++ > cooldownTime)
+				fireCooldown += Time.deltaTime;
+				if (fireCooldown > cooldownTime)
 				{
 					controller.aiming = true;
 					fireCooldown = 0;

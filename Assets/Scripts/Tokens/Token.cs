@@ -9,17 +9,15 @@ namespace Assets.Scripts.Tokens
     public abstract class Token : MonoBehaviour
     {
         // Tokens will be collected via trigger
-        void OnTriggerEnter(Collider col)
-        {
-			TokenCollected(col.transform.root.GetComponent<Controller>());
-            // Set inactive since we are pooling
-            gameObject.SetActive(false);
-        }
+        //void OnTriggerEnter(Collider col)
+        //{
+		//	TokenCollected(col.transform.root.GetComponent<Controller>());
+        //}
 
         /// <summary>
         /// Token will use the Controller to get the appropriate component
         /// </summary>
         /// <param name="controller">The controller that is collecting the token</param>
-        protected abstract void TokenCollected(Controller controller);
+        public abstract void TokenCollected(Controller controller);
 	}
 }

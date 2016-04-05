@@ -21,8 +21,6 @@ namespace Assets.Scripts.Arrows
         [SerializeField]
         private LayerMask doNotActivate;
 
-        // Limit types you can have to be only 3
-        private int MAX_TYPES = 3;
         // Damage to be dealt when hit by an arrow
         private float damage = 10f;
         // Player IDs for passing along information
@@ -106,10 +104,10 @@ namespace Assets.Scripts.Arrows
                     //}
                 }
                 trackingTime -= Time.deltaTime;
-            }
-            else
-            {
-                rigidbody.useGravity = true;
+                if (trackingTime <= 0)
+                {
+                    rigidbody.useGravity = true;
+                }
             }
             // Point the arrow the direction it is travelling
             if (rigidbody != null && rigidbody.velocity != Vector3.zero)
@@ -118,6 +116,10 @@ namespace Assets.Scripts.Arrows
                 // Cache the previous velocity
                 prevVelocity = rigidbody.velocity;
             }
+			if (transform.position.y < -30) 
+			{
+				GameObject.Destroy(gameObject);
+			}
         }
 
         // Arrow hits something
@@ -130,6 +132,7 @@ namespace Assets.Scripts.Arrows
             {
                 // Damage the player hit
                 Controller controller = col.transform.GetComponent<Controller>();
+				SFXManager.instance.PlayArrowHit();
                 controller.LifeComponent.ModifyHealth(-damage, fromPlayer);
                 hitPlayer = controller.ID;
             }
@@ -173,6 +176,7 @@ namespace Assets.Scripts.Arrows
 			if (col.transform.root.tag.Equals("Player"))
             {
 				Controller controller = col.transform.root.GetComponent<Controller>();
+				SFXManager.instance.PlayArrowHit();
                 controller.LifeComponent.ModifyHealth(-damage, fromPlayer);
                 hitPlayer = controller.ID;
 				trackingTime = 0f;
@@ -236,7 +240,6 @@ namespace Assets.Scripts.Arrows
 				case Enums.Arrows.Lifesteal:
 					return gameObject.AddComponent<LifestealArrow>();
                 case Enums.Arrows.Tracking:
-                    rigidbody.useGravity = false;
                     trackingTime = TrackingArrow.trackingTime;
                     return gameObject.AddComponent<TrackingArrow>();
 				case Enums.Arrows.Virus:
@@ -245,6 +248,10 @@ namespace Assets.Scripts.Arrows
 					return gameObject.AddComponent<SplittingArrow>();
                 case Enums.Arrows.HeavyKnockback:
                     return gameObject.AddComponent<HeavyKnockbackArrow>();
+                case Enums.Arrows.RapidFire:
+                    return gameObject.AddComponent<RapidFireArrow>();
+                case Enums.Arrows.Grappling:
+                    return gameObject.AddComponent<GrapplingArrow>();
                 default:
                     return gameObject.AddComponent<NormalArrow>();
             }

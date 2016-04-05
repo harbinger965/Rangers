@@ -39,11 +39,11 @@ public class KeyboardWrapper : ControllerInputWrapper
 				return vec.normalized.y;
 			case Axis.DPadX:
 				axisName = getAxisName("DPadX", "DPadX", "DPadX");
-				scale = 0.09f;
+//				scale = 0.09f;
 				break;
 			case Axis.DPadY:
 				axisName = getAxisName("DPadY", "DPadY", "DPadY");
-				scale = 0.09f;
+//				scale = 0.09f;
 				break;
         }
         return Input.GetAxis(axisName) * scale;
@@ -161,6 +161,9 @@ public class KeyboardWrapper : ControllerInputWrapper
 			break;
 		case Buttons.RightStickClick:
 			buttonName = getButtonName("RightStickClick", "RightStickClick", "RightStickClick");
+			break;
+		case Buttons.Back:
+			buttonName = getButtonName("Back", "Back", "Back");
 			break;
 		}
 		return buttonName;

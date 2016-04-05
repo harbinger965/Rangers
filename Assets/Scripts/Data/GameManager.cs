@@ -22,6 +22,9 @@ namespace Assets.Scripts.Data
         // List of all the controllers of the players
         private List<Controller> controllers;
 
+		//List of all spawnpoints, collected on Start()
+		private List<GameObject> spawnPoints;
+
         // List of all the types of tokens available
         [SerializeField]
         private List<GameObject> allTokens;
@@ -30,13 +33,22 @@ namespace Assets.Scripts.Data
         [SerializeField]
         private GameObject playerPrefab;
 
+		[SerializeField]
+		private GameObject aiPlayerPrefab;
+
         // Match timer (optional)
         private Timer matchTimer;
 
+		//GameOver UI
+		private GameObject gameOverUI;
+		private bool gameOver;
+		private PlayerID currentWinner;
+
         // Current game settings to abide by
-        private GameSettings currentGameSettings;
+		private GameSettings currentGameSettings;
+		private TargetSettings currentTargetGameSettings;
         // CustomColor object for efficient color getting
-        private CustomColor customColor;
+        //private CustomColor customColor;
 
         private int numDead = 0;
 
@@ -45,7 +57,6 @@ namespace Assets.Scripts.Data
         {
             if (instance == null)
             {
-                DontDestroyOnLoad(gameObject);
                 instance = this;
             }
             else if (instance != this)
@@ -54,13 +65,14 @@ namespace Assets.Scripts.Data
             }
 
             controllers = new List<Controller>();
-            customColor = new CustomColor();
+			spawnPoints = new List<GameObject>();
         }
 
         void Start()
         {
             // Call Init
-            InitializeMatch();
+			gameOverUI = GameObject.Find("GameOverUI");
+			gameOverUI.SetActive(false);
         }
 
 		void OnLevelWasLoaded(int level)
@@ -82,9 +94,29 @@ namespace Assets.Scripts.Data
             {
                 controllers.Add(findControllers[i]);
             }
-            // Load the last settings used
-            //currentGameSettings = LoadManager.LoadGameSettings(GameSettings.persistentExtension);
-            currentGameSettings = LoadManager.LoadGameSettingsXML(settingsName);
+			// Load the last settings used
+			if(settingsName.Contains("Target"))
+				currentTargetGameSettings = LoadManager.LoadTargetSettingsXML(settingsName);
+			else
+				currentGameSettings = LoadManager.LoadGameSettings(settingsName);
+
+			//Find the spawnpoints
+			spawnPoints.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
+
+			//If there aren't already players in this scene, we need to create them
+			if(controllers.Count == 0) {
+				PlayerID currentID = PlayerID.None;
+				for (int i = 0; i < ControllerManager.instance.NumPlayers; i++) {
+					currentID = (PlayerID)(i + 1);
+					GameObject spawnPrefab = ControllerManager.instance.IsAIController(currentID) ? aiPlayerPrefab : playerPrefab;
+					GameObject temp = (GameObject)GameObject.Instantiate(spawnPrefab, spawnPoints[i].transform.position, Quaternion.Euler(0,90,0));
+					Controller tempController = temp.GetComponent<Controller>();
+					controllers.Add(tempController);
+					tempController.ProfileComponent = ProfileManager.instance.GetProfile(currentID);
+					tempController.ID = currentID;
+				}
+			}
+
 
             // Initialize the tokens
             TokenSpawner.instance.Init(currentGameSettings.EnabledTokens);
@@ -95,9 +127,9 @@ namespace Assets.Scripts.Data
             }
 
             // Set up a timer that counts up for targets
-            if (currentGameSettings.Type.Equals(Enums.GameType.Target))
+			if (currentTargetGameSettings != null)
             {
-                currentGameSettings.TargetsInLevel = FindObjectsOfType<Target>().Length;
+				currentTargetGameSettings.TargetsInLevel = FindObjectsOfType<Target>().Length;
                 matchTimer = gameObject.AddComponent<Timer>();
                 matchTimer.Initialize(Mathf.Infinity, "Match Timer");
             }
@@ -105,11 +137,10 @@ namespace Assets.Scripts.Data
             else
             {
                 // If the timer is enabled in that game type
-                if (currentGameSettings.TimeLimitEnabled)
+				if (currentGameSettings.TimeLimit > 0)
                 {
-                    matchTimer = gameObject.AddComponent<CountdownTimer>();
-                    matchTimer.Initialize(currentGameSettings.TimeLimit, "Match Timer");
-                    ((CountdownTimer)matchTimer).TimeOut += new CountdownTimer.TimerEvent(TimeUp);
+					float timeLimit = currentGameSettings.TimeLimit == 0 ? Mathf.Infinity : currentGameSettings.TimeLimit;
+					matchTimer = CountdownTimer.CreateTimer(gameObject, timeLimit, "Match Timer", TimeUp);
                 }
             }
         }
@@ -120,7 +151,7 @@ namespace Assets.Scripts.Data
         /// <param name="t">The timer that timed out</param>
         private void TimeUp(CountdownTimer t)
         {
-            Debug.Log("Time is up");
+			GameOver();
         }
 
         /// <summary>
@@ -138,8 +169,34 @@ namespace Assets.Scripts.Data
         private void GameOver()
         {
             //Debug.Log("Match concluded");
-            CountdownTimer.CreateTimer(gameObject, 3f, "GameOver", ResetLevel);
+            if (matchTimer != null) matchTimer.On = false;
+			gameOverUI.SetActive(true);
+			gameOver = true;
+			foreach(Controller c in controllers) {
+				c.Disable();
+			}
+			CountdownTimer.CreateTimer(gameObject, 10f, "GameOver", GoToMatchSummary);
+
         }
+
+		private void GoToMatchSummary(CountdownTimer t)
+		{
+			GameObject g = new GameObject("MatchSummaryManager");
+			MatchSummaryManager summary = g.AddComponent<MatchSummaryManager>();
+			DontDestroyOnLoad(g);
+			MatchSummaryManager.winner = currentWinner;
+			MatchSummaryManager.playerInfo = new Dictionary<PlayerID, int>();
+			if(currentGameSettings.Type == Enums.GameType.Deathmatch) {
+				for(int i = 0; i < controllers.Count; i++) {
+					MatchSummaryManager.playerInfo.Add(controllers[i].ID,controllers[i].LifeComponent.kills);
+				}
+			} else {
+				for(int i = 0; i < controllers.Count; i++) {
+					MatchSummaryManager.playerInfo.Add(controllers[i].ID,(int)controllers[i].LifeComponent.Lives);
+				}
+			}
+			SceneManager.LoadScene("MatchSummary", LoadSceneMode.Single);
+		}
 
         /// <summary>
         /// Resets the scene.
@@ -159,17 +216,67 @@ namespace Assets.Scripts.Data
             // Find those two players
             Controller victim = controllers.Find(x => x.ID.Equals(killed));
             Controller killer = controllers.Find(x => x.ID.Equals(killedBy));
-            // Increment killer score provided there is a killer that is not self
-            if(killer != null) killer.LifeComponent.kills++;
             
             // Check if the game is over based on gametype
-            if(currentGameSettings.Type.Equals(Enums.GameType.Kills))
+            if(currentGameSettings.Type.Equals(Enums.GameType.Deathmatch))
             {
-                if (killer != null && killer.LifeComponent.kills > currentGameSettings.KillLimit) GameOver();
+				// Increment killer score provided there is a killer that is not self
+				if(killer == victim)
+				{
+					killer.LifeComponent.kills--;
+					return;
+				}
+				if (killer == null) return;
+				killer.LifeComponent.kills++;
+
+				float maxNumKills = Mathf.NegativeInfinity;
+				PlayerID mostKills = PlayerID.None;
+				foreach(Controller c in controllers) {
+					if(c.LifeComponent.kills > maxNumKills) {
+						maxNumKills = c.LifeComponent.kills;
+						mostKills = c.ID;
+					} else if(c.LifeComponent.kills == maxNumKills) {
+						if (mostKills != PlayerID.None) {
+							if (c.LifeComponent.Deaths < GetPlayer(mostKills).LifeComponent.Deaths) {
+								mostKills = c.ID;
+							} else if (c.LifeComponent.Deaths == GetPlayer(mostKills).LifeComponent.Deaths) {
+								mostKills = PlayerID.None;
+							}
+						} else {
+							PlayerID winningID = PlayerID.None;
+							float leastDeaths = Mathf.Infinity;
+							foreach (Controller controller in controllers) {
+								if (controller.LifeComponent.kills == maxNumKills) {
+									if (controller.LifeComponent.Deaths < leastDeaths) {
+										winningID = controller.ID;
+										leastDeaths = controller.LifeComponent.Deaths;
+									} else if (controller.LifeComponent.Deaths == leastDeaths) {
+										winningID = PlayerID.None;
+									}
+								}
+							}
+							mostKills = winningID;
+						}
+					}
+				}
+				currentWinner = mostKills;
+                if (killer.LifeComponent.kills >= currentGameSettings.KillLimit) GameOver();
             }
             if (currentGameSettings.Type.Equals(Enums.GameType.Stock))
             {
                 if (victim.LifeComponent.Lives <= 0) numDead++;
+
+				int maxLives = -99999999;
+				PlayerID mostLives = PlayerID.None;
+				foreach(Controller c in controllers) {
+					if(c.LifeComponent.Lives > maxLives) {
+						maxLives = (int)c.LifeComponent.Lives;
+						mostLives = c.ID;
+					} else if (c.LifeComponent.Lives == maxLives) {
+						mostLives = PlayerID.None;
+					}
+				}
+				currentWinner = mostLives;
                 if (numDead >= controllers.Count - 1) GameOver();
             }
         }
@@ -187,7 +294,7 @@ namespace Assets.Scripts.Data
                 // Initialize the respawn timer
                 CountdownTimer t = gameObject.AddComponent<CountdownTimer>();
                 t.Initialize(3f, deadPlayer.ID.ToString());
-                t.TimeOut += new CountdownTimer.TimerEvent(ResawnHelper);
+                t.TimeOut += new CountdownTimer.TimerEvent(RespawnHelper);
             }
         }
 
@@ -195,14 +302,14 @@ namespace Assets.Scripts.Data
         /// Target for the respawn timer to run on timeout.
         /// </summary>
         /// <param name="t">The timer that is firing the event</param>
-        private void ResawnHelper(CountdownTimer t)
+        private void RespawnHelper(CountdownTimer t)
         {
             // Find the dead player again
             Controller deadPlayer = controllers.Find(x => x.ID.Equals(System.Enum.Parse(typeof(PlayerID), t.ID)));
             if (deadPlayer != null)
             {
                 // Find an appropriate spawning pod (set to default for now)
-                deadPlayer.transform.position = Vector3.zero;
+				deadPlayer.transform.position = spawnPoints[Random.Range(0,spawnPoints.Count)].transform.position;
                 // Let the player revive itself
                 deadPlayer.LifeComponent.Respawn();
             }
@@ -259,6 +366,24 @@ namespace Assets.Scripts.Data
         {
             get { return controllers; }
         }
+
+		public float CurrentTime
+		{
+			get {
+				if(matchTimer) return matchTimer.CurrentTime;
+				return -1f;
+			}
+		}
+
+		public bool GameFinished
+		{
+			get {return gameOver; }
+		}
+
+		public PlayerID CurrentWinner
+		{
+			get {return currentWinner; }
+		}
         #endregion
     }
 }

@@ -99,6 +99,8 @@ public class LogitechControllerWrapper : ControllerInputWrapper
                 return getButtonName("4", "4", "4");
             case Buttons.Start:
                 return getButtonName("9", "9", "9");
+            case Buttons.Back:
+                return getButtonName("8", "8", "8");
         }
         return "";
     }

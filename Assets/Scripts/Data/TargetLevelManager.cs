@@ -60,7 +60,6 @@ namespace Assets.Scripts.Data
 
         protected override void GameOver()
         {
-            Debug.Log("Match Concluded");
             running = false;
         }
 

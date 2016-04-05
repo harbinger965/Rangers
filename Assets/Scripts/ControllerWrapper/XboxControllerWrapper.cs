@@ -98,7 +98,9 @@ public class XboxControllerWrapper : ControllerInputWrapper
 		case Buttons.LeftStickClick:
 			buttonName = getButtonName("8", "9", "11");
 			break;
-
+        case Buttons.Back:
+            buttonName = getButtonName("6", "6", "10");
+            break;
 		}
 		return buttonName;
 	}
@@ -148,6 +150,9 @@ public class XboxControllerWrapper : ControllerInputWrapper
                 break;
             case Buttons.LeftStickClick:
                 buttonName = getButtonName("8", "9", "11");
+                break;
+            case Buttons.Back:
+                buttonName = getButtonName("6", "6", "10");
                 break;
         }
         return Input.GetButtonUp(buttonName);
