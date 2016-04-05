@@ -229,13 +229,17 @@ namespace Assets.Scripts.Data
 				if (killer == null) return;
 				killer.LifeComponent.kills++;
 
+				// find the most kills
 				float maxNumKills = Mathf.NegativeInfinity;
 				PlayerID mostKills = PlayerID.None;
+
+				//iterate through controllers
 				foreach(Controller c in controllers) {
+					//if this controller has the most kills so far
 					if(c.LifeComponent.kills > maxNumKills) {
 						maxNumKills = c.LifeComponent.kills;
 						mostKills = c.ID;
-					} else if(c.LifeComponent.kills == maxNumKills) {
+					} else if(c.LifeComponent.kills == maxNumKills) { //if this controller has the same number of kills
 						if (mostKills != PlayerID.None) {
 							if (c.LifeComponent.Deaths < GetPlayer(mostKills).LifeComponent.Deaths) {
 								mostKills = c.ID;
