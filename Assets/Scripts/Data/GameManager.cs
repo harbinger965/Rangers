@@ -19,6 +19,8 @@ namespace Assets.Scripts.Data
         /// </summary>
         public static GameManager instance;
 
+		public static string lastLoadedLevel;
+
         // List of all the controllers of the players
         private List<Controller> controllers;
 

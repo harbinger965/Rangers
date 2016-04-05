@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEngine.UI;
 using Assets.Scripts.UI;
 using Assets.Scripts.Util;
+using UnityEngine.SceneManagement;
+using Assets.Scripts.Data;
 
 public class MatchSummaryUI : MonoBehaviour {
 
@@ -118,7 +120,14 @@ public class MatchSummaryUI : MonoBehaviour {
 			Navigator.Navigate(Enums.MenuDirections.Down);
 		}
 
-
 		if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.A, PlayerID.One)) Navigator.CallSubmit();
+	}
+
+	public void Rematch() {
+		SceneManager.LoadScene(GameManager.lastLoadedLevel, LoadSceneMode.Single);
+	}
+
+	public void MainMenu() {
+		SceneManager.LoadScene(0, LoadSceneMode.Single);
 	}
 }
