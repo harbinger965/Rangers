@@ -88,8 +88,13 @@ namespace Assets.Scripts.Player.AI
 			controller.aim = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
 
 			// Keep the bow drawn without shooting if there isn't a clear shot.
+			if (left)
+			{
+				positionOffset.x = -positionOffset.x;
+			}
 			RaycastHit hit;
-			if (!controller.HasClearShot(positionOffset, out hit)) {
+			if (!controller.HasClearShot(positionOffset, out hit))
+			{
 				controller.aiming = true;
 				return;
 			}

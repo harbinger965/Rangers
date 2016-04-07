@@ -45,25 +45,28 @@ namespace Assets.Scripts.Player
 			{
 				facingRight = !animator.GetCurrentAnimatorStateInfo(0).IsTag("Left");
 			}
-			if(facingRight && Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9))) 
+			if (animator.GetBool("CanMove"))
 			{
-				animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
-			} 
-			else if(!facingRight && Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9))) 
-			{
-				animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
-			} 
-			else 
-			{
-				if(!jumping) 
+				if(facingRight && Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9))) 
 				{
-					animator.SetFloat("RunSpeed", motion);
-					transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
+					animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
+				} 
+				else if(!facingRight && Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9))) 
+				{
+					animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
 				} 
 				else 
 				{
-					animator.SetFloat("RunSpeed", motion);
-					transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
+					if(!jumping) 
+					{
+						animator.SetFloat("RunSpeed", motion);
+						transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
+					} 
+					else 
+					{
+						animator.SetFloat("RunSpeed", motion);
+						transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
+					}
 				}
 			}
 			lastMotion = motion;

@@ -54,7 +54,18 @@ namespace Assets.Scripts.UI
             {
                 Destroy(gameObject);
             }
+				
         }
+
+		void OnEnable() {
+			if(ControllerManager.instance.NumPlayers > 0) {
+				state = Enums.UIStates.Main;
+				UpdatePanels(MainPanel);
+				PlayerPanel.gameObject.SetActive(true);
+				PlayerPanel.SetAsFirstSibling();
+				menuTitle.SetActive(true);
+			}
+		}
 
         void Update()
         {
@@ -238,6 +249,7 @@ namespace Assets.Scripts.UI
 
 		public void GoToGame(MapSelector selection) {
 			string selectedMap = selection.arenaSelector ? ((Enums.BattleStages)selection.currentSelectedMap).ToString() : ((Enums.TargetPracticeStages)selection.currentSelectedMap).ToString();
+			GameManager.lastLoadedLevel = selectedMap;
 			if(ProfileManager.instance.NumSignedIn() > 1) SceneManager.LoadScene(selectedMap, LoadSceneMode.Single);
 		}
 
