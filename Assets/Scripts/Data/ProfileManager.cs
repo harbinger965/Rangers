@@ -39,6 +39,20 @@ public class ProfileManager : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Shifts profiles forward by one. Evicts the fourth player if any.
+	/// </summary>
+	public void ShiftProfiles() {
+		for (int i = NumSignedIn(); i > 0; i--) {
+			PlayerID currentID = (PlayerID)i;
+			ProfileData data = GetProfile(currentID);
+			loadedProfiles.Remove(currentID);
+			if (i < 4) {
+				AddProfile(data, (PlayerID)(i + 1));
+			}
+		}
+	}
+
 	public ProfileData GetProfile(PlayerID id) {
 		return loadedProfiles[id];
 	}
