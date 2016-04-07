@@ -47,8 +47,12 @@ namespace Assets.Scripts.Player
 		public void Fire()
 		{
 			GameObject arrow = (GameObject)Instantiate(arrowPrefab, bowPosition.position + (firePoint.position - bowPosition.position)/2f, firePoint.rotation);
-			arrow.GetComponent<Rigidbody>().AddRelativeForce((firePoint.position - (bowPosition.position+Vector3.up*0.1f)) * 20 * (strength+0.1f), ForceMode.Impulse);
+			Vector3 arrowVel = (firePoint.position - (bowPosition.position+Vector3.up*0.1f)) * 20 * (strength+0.1f);
+			arrow.GetComponent<Rigidbody>().AddRelativeForce(arrowVel, ForceMode.Impulse);
 			arrow.GetComponent<Arrows.ArrowController>().InitArrow(types, controller.ID);
+			if(arrowVel.magnitude < 10f) {
+				arrow.transform.FindChild("HeadCollider").GetComponent<Collider>().enabled = false;
+			}
 			arrow.transform.FindChild("Model").GetComponent<TrailRenderer>().material.color = firePoint.GetComponent<SpriteRenderer>().color;
 			strength = 0;
 			SFXManager.instance.PlayArrowShoot();
@@ -61,8 +65,15 @@ namespace Assets.Scripts.Player
 		/// <param name="position">Position where the firepoint is set to</param>
 		public void UpdateFirePoint(Vector3 position)
 		{
-			IncreaseStrength();
-			firePoint.localPosition = Vector3.MoveTowards(firePoint.localPosition, position*strength*2f, Time.deltaTime*Vector3.Distance(firePoint.localPosition,position*strength*2f)*4f);
+			float mag = position.magnitude;
+			if(mag < 0.95f) {
+				strength = Mathf.MoveTowards(strength, mag*MAX_STRENGTH, Time.deltaTime);
+//				IncreaseStrength(mag);
+			} else {
+				strength = MAX_STRENGTH;
+			}
+			
+			firePoint.localPosition = Vector3.MoveTowards(firePoint.localPosition, position*strength*2f, Time.deltaTime*Vector3.Distance(firePoint.localPosition,position*strength*2f));
 
 			//Makes the curving aim line
 			Vector3[] linePoints = new Vector3[10];
@@ -78,9 +89,9 @@ namespace Assets.Scripts.Player
 			firePoint.GetComponent<LineRenderer>().SetPositions(linePoints);
 		}
 
-		private void IncreaseStrength() {
+		private void IncreaseStrength(float value) {
 			strength = Bitwise.IsBitOn(types, (int)Enums.Arrows.RapidFire)?
-				MAX_STRENGTH : Mathf.Min(MAX_STRENGTH,strength+(Time.deltaTime*2f));
+				MAX_STRENGTH : Mathf.Min(MAX_STRENGTH,strength+(Time.deltaTime*2f*value));
 		}
 
 		public void UpdateBodyAim() {
