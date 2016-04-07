@@ -183,5 +183,16 @@ namespace Assets.Scripts.UI.Profiles
             // Set the target of the scroll to lerp to
             target += step * dir;
         }
+
+		/// <summary>
+		/// Resets the name creator.
+		/// </summary>
+		public void Reset()
+		{
+			t.text = "";
+			target = 0;
+			index = 0;
+			rect.horizontalNormalizedPosition = 0;
+		}
     }
 }

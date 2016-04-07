@@ -60,8 +60,7 @@ public class ControllerManager  {
 		if(!playerControls.ContainsValue(kw) && kw.GetButton(connectCode)) {
 			for(int j = 1; j < 5; j++) {
 				if(!playerControls.ContainsKey((PlayerID)j)) {
-					playerControls.Add((PlayerID)(j), kw);
-					Debug.Log((PlayerID)(j) + ": " + kw + " added");
+					RegisterPlayerController(j, kw);
 					return true;
 				}
 			}
@@ -73,8 +72,7 @@ public class ControllerManager  {
 				if(ciw != null && !playerControls.ContainsValue(ciw) && ciw.GetButton(connectCode)) {
 					for(int j = 1; j < 5; j++) {
 						if(!playerControls.ContainsKey((PlayerID)j)) {
-							playerControls.Add((PlayerID)(j), ciw);
-							Debug.Log((PlayerID)(j) + ": " + ciw + " added");
+							RegisterPlayerController(j, ciw);
 							return true;
 						}
 					}
@@ -83,6 +81,27 @@ public class ControllerManager  {
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// Registers a player in the controls map.
+	/// </summary>
+	/// <param name="id">The ID of the player being registered. </param>
+	/// <param name="ciw">The controller being registered. </param>
+	private void RegisterPlayerController(int id, ControllerInputWrapper ciw) {
+		if (IsAllAI()) {
+			for (int i = NumPlayers; i > 0; i--) {
+				PlayerID currentID = (PlayerID)i;
+				ControllerInputWrapper controller = playerControls[currentID];
+				playerControls.Remove(currentID);
+				if (i < 4) {
+					playerControls.Add((PlayerID)(i + 1), controller);
+				}
+			}
+			id = 1;
+		}
+		playerControls.Add((PlayerID)(id), ciw);
+		Debug.Log((PlayerID)(id) + ": " + ciw + " added");
 	}
 
 	/// <summary>
@@ -175,6 +194,36 @@ public class ControllerManager  {
 		if(playerControls.ContainsKey(id))
 			return playerControls[id] is AIWrapper;
 		return false;
+	}
+
+	/// <summary>
+	/// Checks if only AI players are registered.
+	/// </summary>
+	/// <returns>Whether only AI players are registered.</returns>
+	private bool IsAllAI() {
+		if (NumPlayers == 0) {
+			return false;
+		}
+		foreach (ControllerInputWrapper controller in playerControls.Values) {
+			if (!(controller is AIWrapper)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Counts the number of registered AI players.
+	/// </summary>
+	/// <returns>The number of registered AI players.</returns>
+	public int CountAI() {
+		int numAI = 0;
+		foreach (ControllerInputWrapper controller in playerControls.Values) {
+			if (controller is AIWrapper) {
+				numAI++;
+			}
+		}
+		return numAI;
 	}
 
 	public ControllerInputWrapper getControllerType(int joyNum)
