@@ -103,7 +103,6 @@ namespace Assets.Scripts.Player.AI
 			{
 				if (controller.ArcheryComponent.StrengthPercentage >= power)
 				{
-					controller.ArcheryComponent.StrengthPercentage = power;
 					controller.aiming = false;
 				}
 			}
