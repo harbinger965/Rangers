@@ -83,7 +83,7 @@ namespace Assets.Scripts.Attacks
 
 		void Update()
 		{
-			timeElapsed += Time.deltaTime;
+			timeElapsed += GameManager.instance.deltaTime;
 			if(timeElapsed > waitTime)
 			{
 				speed = Mathf.Min(speed + 0.02f, 1f);

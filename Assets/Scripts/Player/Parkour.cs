@@ -106,7 +106,6 @@ namespace Assets.Scripts.Player
 		void Update() 
 		{
 			if(!kneeL.enabled) {
-				Debug.Log(legColliderReEnabler);
 				legColliderReEnabler -= Time.deltaTime;
 				if(legColliderReEnabler <= 0) {
 					kneeL.enabled = true;
