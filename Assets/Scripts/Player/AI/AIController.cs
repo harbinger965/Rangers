@@ -155,6 +155,12 @@ namespace Assets.Scripts.Player.AI
 			return jump;
 		}
 
+		/// <inheritdoc/>
+		internal override bool IsHoldingDown()
+		{
+			return true;
+		}
+
 		/// <summary>
 		/// Checks if there is an unobstructed shot between the ranger and a target.
 		/// </summary>

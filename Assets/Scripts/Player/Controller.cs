@@ -131,6 +131,7 @@ namespace Assets.Scripts.Player
 			}
 		}
 
+		#region Virtual Methods
 		/// <summary>
 		/// Checks if the controller is holding the jump button.
 		/// </summary>
@@ -139,6 +140,16 @@ namespace Assets.Scripts.Player
 		{
 			return false;
 		}
+
+		/// <summary>
+		/// Determines whether this instance is holding down on the analog stick.
+		/// </summary>
+		/// <returns><c>true</c> if this instance is holding down; otherwise, <c>false</c>.</returns>
+		internal virtual bool IsHoldingDown()
+		{
+			return false;
+		}
+		#endregion
 
         #region C# Properties
         /// <summary>
