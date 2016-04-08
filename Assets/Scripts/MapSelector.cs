@@ -56,8 +56,6 @@ public class MapSelector : MonoBehaviour {
 	private string GetBattleStageName() {
 		Enums.BattleStages stage = (Enums.BattleStages)currentSelectedMap;
 		switch (stage) {
-		case Enums.BattleStages.ProLeagueVariant1: return "Pro League Variant 1";
-		case Enums.BattleStages.ProLeagueVariant2: return "Pro League Variant 2";
 		default: return AddSpaces(stage.ToString());
 		}
 	}
