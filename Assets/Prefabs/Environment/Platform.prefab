@@ -60,7 +60,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 454524}
   - 65: {fileID: 6529718}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 477574}
   - 65: {fileID: 6506650}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Ledge2
   m_TagString: Ledge
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 423004}
   - 65: {fileID: 6549954}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Ledge1
   m_TagString: Ledge
   m_Icon: {fileID: 0}

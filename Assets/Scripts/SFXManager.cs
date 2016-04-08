@@ -32,7 +32,7 @@ public class SFXManager : MonoBehaviour {
 	}
 
 	public void PlayJump() {
-		GetComponent<AudioSource>().PlayOneShot(jump);
+		GetComponent<AudioSource>().PlayOneShot(jump,0.5f);
 	}
 
 	public void PlayFootstep() {
@@ -52,7 +52,7 @@ public class SFXManager : MonoBehaviour {
 	}
 
 	public void PlayClick() {
-		GetComponent<AudioSource>().PlayOneShot(click, 0.5f);
+		GetComponent<AudioSource>().PlayOneShot(click, 0.25f);
 	}
 
 	public void PlayArrowPull() {

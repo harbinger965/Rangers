@@ -11,7 +11,12 @@ public class TokenToSprite : MonoBehaviour {
 	public Dictionary<Enums.Arrows,Sprite> dict;
 
 	void Start() {
-		instance = this;
+		if(instance == null) {
+			instance = this;
+		} else if(instance != this) {
+			Destroy(this);
+		}
+
 		dict = new Dictionary<Enums.Arrows, Sprite>();
 		for(int i = 0; i < types.Length; i++) {
 			dict.Add(types[i],images[i]);

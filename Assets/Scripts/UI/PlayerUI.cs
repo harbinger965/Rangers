@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class PlayerUI : MonoBehaviour 
 {
 
-	private Image healthBar, strengthBar;
+	private Image healthBar, followBar, strengthBar;
 	private Controller playerRef;
 
 	/// <summary> The panel displaying the player's health. </summary>
@@ -22,6 +22,7 @@ public class PlayerUI : MonoBehaviour
 		healthPanel = transform.FindChild("HealthPanel");
 		strengthPanel = transform.FindChild("StrengthPanel");
 		healthBar = healthPanel.FindChild("Overlay").GetComponent<Image>();
+		followBar = healthPanel.FindChild("Follow").GetComponent<Image>();
 		strengthBar = strengthPanel.FindChild("Overlay").GetComponent<Image>();
 	}
 	
@@ -29,10 +30,11 @@ public class PlayerUI : MonoBehaviour
 	void Update () 
 	{
 		float health = playerRef.LifeComponent.HealthPercentage;
-		float strength = playerRef.ArcheryComponent.StrengthPercentage;
+//		float strength = playerRef.ArcheryComponent.StrengthPercentage;
 
 		healthBar.fillAmount = health;
-		strengthBar.rectTransform.localScale = new Vector3(-strength, strength, strength);
+		followBar.fillAmount = Mathf.MoveTowards(followBar.fillAmount, healthBar.fillAmount, Time.deltaTime/2f);
+//		strengthBar.rectTransform.localScale = new Vector3(-strength, strength, strength);
 
 		if(playerRef.ArcheryComponent.UpperBodyFacingRight && !Mathf.Approximately(transform.localEulerAngles.y,270f))
 		{

@@ -13,7 +13,7 @@ namespace Assets.Scripts.Data
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-        public string settingsName = "Stock";
+        public string settingsName = "Stock.dat";
         /// <summary>
         /// Use a singleton instance to make sure there is only one
         /// </summary>
@@ -58,6 +58,8 @@ namespace Assets.Scripts.Data
 		public float deltaTime = 0f;
 		private List<Vector3> pausedVelocities;
 
+		public float countInTimer = 5f;
+
         // Sets up singleton instance. Will remain if one does not already exist in scene
         void Awake()
         {
@@ -84,11 +86,19 @@ namespace Assets.Scripts.Data
 
 		void Update()
 		{
-			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) {
+			if(countInTimer > 0) {
+				if(matchTimer) matchTimer.On = false;
+				countInTimer -= Time.deltaTime;
+			} else if(countInTimer != -100 && matchTimer && !matchTimer.On) {
+				matchTimer.On = false;
+				countInTimer = -100f;
+			}
+
+			if(!GameFinished && countInTimer <= 0 && ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) {
 				paused = !paused;
 				recentPause = true;
 			}
-			if(paused) {
+			if(!GameFinished && paused) {
 				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						pausedVelocities.Add(controllers[i].GetComponent<Rigidbody>().velocity);
@@ -99,7 +109,7 @@ namespace Assets.Scripts.Data
 					if(matchTimer) matchTimer.On = false;
 					recentPause = false;
 				}
-			} else {
+			} else if(!GameFinished) {
 				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						controllers[i].GetComponent<Rigidbody>().velocity = pausedVelocities[i];
@@ -215,7 +225,7 @@ namespace Assets.Scripts.Data
         /// <summary>
         /// Handles what happens when the game is over
         /// </summary>
-        private void GameOver()
+		public void GameOver()
         {
             //Debug.Log("Match concluded");
             if (matchTimer != null) matchTimer.On = false;
@@ -442,7 +452,7 @@ namespace Assets.Scripts.Data
 
 		public bool GameFinished
 		{
-			get {return gameOver; }
+			get {return gameOver || countInTimer > 0; }
 		}
 
 		public PlayerID CurrentWinner
@@ -453,6 +463,7 @@ namespace Assets.Scripts.Data
 		public bool IsPaused
 		{
 			get { return paused; }
+			set { paused = value; }
 		}
         #endregion
     }

@@ -10,20 +10,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ProStadiums/RangerDreams.unity
   - enabled: 1
-    path: Assets/Scenes/MatchSummary.unity
-  - enabled: 1
     path: Assets/Scenes/ProStadiums/ProLeagueStandard.unity
-  - enabled: 1
-    path: Assets/Scenes/ProStadiums/ProLeagueVariant1.unity
-  - enabled: 1
-    path: Assets/Scenes/ProStadiums/ProLeagueVariant2.unity
   - enabled: 1
     path: Assets/Scenes/ProStadiums/RangerDreams.unity
   - enabled: 1
-    path: Assets/Scenes/ProStadiums/ProLeague_SteamLords.unity
+    path: Assets/Scenes/ProStadiums/SteamLords.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/FireOnMountFuji.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/FinalDestination.unity
   - enabled: 1
     path: Assets/Scenes/ProStadiums/TheOrbitalBelt.unity
   - enabled: 1
-    path: Assets/Scenes/ProStadiums/ProLeagueStandard.unity
+    path: Assets/Scenes/MatchSummary.unity
   - enabled: 1
     path: Assets/Scenes/Credits.unity

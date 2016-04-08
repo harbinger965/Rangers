@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 425844}
   - 114: {fileID: 11414844}
+  - 114: {fileID: 11425510}
   m_Layer: 0
   m_Name: TokenSpawner
   m_TagString: Untagged
@@ -40,6 +41,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tokens: []
+--- !u!114 &11425510
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20dc2f380a76a4eb094239cc88b01757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  types: 
+  images: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

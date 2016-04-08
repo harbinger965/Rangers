@@ -11,7 +11,7 @@ namespace Assets.Scripts.Util
         void OnTriggerEnter(Collider col)
         {
             if (col.transform.tag.Equals("Arrow")) Destroy(col.gameObject);
-			if (col.transform.root.tag.Equals("Player")) col.transform.root.GetComponent<Controller>().LifeComponent.ModifyHealth(-100);
+			if (col.transform.root.tag.Equals("Player")) col.transform.root.GetComponent<Controller>().LifeComponent.ModifyHealth(-100, col.transform.root.GetComponent<Controller>().ID);
         }
     }
 }

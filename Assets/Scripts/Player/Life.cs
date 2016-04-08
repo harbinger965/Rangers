@@ -32,6 +32,12 @@ namespace Assets.Scripts.Player
         /// <param name="id">The player who dealt the damage</param>
         public void ModifyHealth(float delta, PlayerID id = PlayerID.None)
         {
+			
+			for(int i = 0; i < controller.playerMats.Count; i++) {
+				controller.playerMats[i].SetColor("_EmissionColor", Color.red);
+			}
+			controller.justDamaged = true;
+
 			if(id != PlayerID.None) {
 				lastAttacker = id;
 				StatisticManager.instance.statistics[id].arrowsHit++;
