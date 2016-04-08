@@ -99,6 +99,7 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 			tagText.color = ProfileManager.instance.GetProfile(playerID).SecondaryColor;
 			tagText.transform.parent.GetComponent<Image>().color = ProfileManager.instance.GetProfile(playerID).PrimaryColor;
 			HidePressToJoinGraphic();
+
 			playerNumIndicator.color = Color.white;
 		} else {
 			ShowNameCreator();
