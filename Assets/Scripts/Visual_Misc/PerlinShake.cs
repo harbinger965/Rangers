@@ -4,12 +4,15 @@ using System.Collections;
 /// <summary>
 /// Perlin shake.
 /// </summary>
-/// <description>Camera script grabbed from this blog: http://unitytipsandtricks.blogspot.com/2013/05/camera-shake.html</description>
+/// <description>
+/// Camera script grabbed from this blog: http://unitytipsandtricks.blogspot.com/2013/05/camera-shake.html 
+/// with minor changes
+/// </description>
 public class PerlinShake : MonoBehaviour {
 	
-	public float duration = 0.5f;
+	public float duration = 0.3f;
 	public float speed = 1.0f;
-	public float magnitude = 0.1f;
+	public float magnitude = 0.07f;
 	
 	public bool test = false;
 	
@@ -32,8 +35,6 @@ public class PerlinShake : MonoBehaviour {
 	IEnumerator Shake() {
 		
 		float elapsed = 0.0f;
-		
-		Vector3 originalCamPos = Camera.main.transform.position;
 		float randomStart = Random.Range(-1000.0f, 1000.0f);
 		
 		while (elapsed < duration) {
@@ -54,12 +55,14 @@ public class PerlinShake : MonoBehaviour {
 			
 			x *= magnitude * damper;
 			y *= magnitude * damper;
+
+			Vector3 targetPos = Camera.main.GetComponent<CameraFollow>().TargetPos;
 			
-			Camera.main.transform.position = new Vector3(x + originalCamPos.x, y + originalCamPos.y, originalCamPos.z);
+			Camera.main.transform.position = new Vector3(x + Camera.main.transform.position.x, y + Camera.main.transform.position.y, Camera.main.transform.position.z);
 				
 			yield return null;
 		}
 		
-		Camera.main.transform.position = originalCamPos;
+		Camera.main.transform.position = Camera.main.GetComponent<CameraFollow>().TargetPos;
 	}
 }
