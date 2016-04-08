@@ -105,6 +105,8 @@ namespace Assets.Scripts.Data
 			//Find the spawnpoints
 			spawnPoints.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
 
+			StatisticManager.instance.statistics = new Dictionary<PlayerID, Statistic>();
+
 			//If there aren't already players in this scene, we need to create them
 			if(controllers.Count == 0) {
 				PlayerID currentID = PlayerID.None;
@@ -116,9 +118,9 @@ namespace Assets.Scripts.Data
 					controllers.Add(tempController);
 					tempController.ProfileComponent = ProfileManager.instance.GetProfile(currentID);
 					tempController.ID = currentID;
+					StatisticManager.instance.statistics.Add(currentID, new Statistic());
 				}
 			}
-
 
             // Initialize the tokens
             TokenSpawner.instance.Init(currentGameSettings.EnabledTokens);
@@ -226,10 +228,22 @@ namespace Assets.Scripts.Data
 				if(killer == victim)
 				{
 					killer.LifeComponent.kills--;
+					StatisticManager.instance.statistics[killer.ID].suicides++;
 					return;
 				}
 				if (killer == null) return;
 				killer.LifeComponent.kills++;
+
+				if(StatisticManager.instance.statistics[killer.ID].killedPlayer.ContainsKey(victim.ID))
+					StatisticManager.instance.statistics[killer.ID].killedPlayer[victim.ID]++;
+				else
+					StatisticManager.instance.statistics[killer.ID].killedPlayer.Add(victim.ID,1);
+
+				if(StatisticManager.instance.statistics[victim.ID].killedByPlayer.ContainsKey(killer.ID))
+					StatisticManager.instance.statistics[victim.ID].killedByPlayer[killer.ID]++;
+				else
+					StatisticManager.instance.statistics[victim.ID].killedByPlayer.Add(killer.ID,1);
+
 
 				// find the most kills
 				float maxNumKills = Mathf.NegativeInfinity;
