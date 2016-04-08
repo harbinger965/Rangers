@@ -90,7 +90,7 @@ namespace Assets.Scripts.Data
 				if(matchTimer) matchTimer.On = false;
 				countInTimer -= Time.deltaTime;
 			} else if(countInTimer != -100 && matchTimer && !matchTimer.On) {
-				matchTimer.On = false;
+				matchTimer.On = true;
 				countInTimer = -100f;
 			}
 
