@@ -16,7 +16,23 @@ public class Statistic {
 
 	public float Accuracy {
 		get {
-			return arrowsShot/(float)arrowsHit;
+			return (float)arrowsHit/Mathf.Max(1,arrowsShot);
+		}
+	}
+
+	public string InfoText {
+		get {
+			string forReturn = "Accuracy- " + Accuracy.ToString("F1") + "\n";
+			forReturn += "Suicides- " + suicides + "\n";
+			forReturn += "Killed-\n";
+			foreach (KeyValuePair<PlayerID,int> kvp in killedPlayer) {
+				forReturn += " " + kvp.Key + ": " + kvp.Value + "\n";
+			}
+			forReturn += "\nKilled By-\n";
+			foreach (KeyValuePair<PlayerID,int> kvp in killedByPlayer) {
+				forReturn += " " + kvp.Key + ": " + kvp.Value + "\n";
+			}
+			return forReturn;
 		}
 	}
 

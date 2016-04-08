@@ -122,6 +122,15 @@ namespace Assets.Scripts.Data
 				}
 			}
 
+			for (int i = 0; i < ControllerManager.instance.NumPlayers; i++) {
+				for (int j = 0; j < ControllerManager.instance.NumPlayers; j++) {
+					if(i != j) {
+						StatisticManager.instance.statistics[(PlayerID)(i+1)].killedPlayer.Add((PlayerID)(j+1),0);
+						StatisticManager.instance.statistics[(PlayerID)(i+1)].killedByPlayer.Add((PlayerID)(j+1),0);
+					}
+				}
+			}
+
             // Initialize the tokens
             TokenSpawner.instance.Init(currentGameSettings.EnabledTokens);
 
