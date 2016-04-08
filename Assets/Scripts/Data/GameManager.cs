@@ -88,7 +88,7 @@ namespace Assets.Scripts.Data
 			if(paused) {
 				if(matchTimer.On) {
 					for(int i = 0; i < controllers.Count; i++) {
-						pausedVelocities.Insert(i,controllers[i].GetComponent<Rigidbody>().velocity);
+						pausedVelocities.Add(controllers[i].GetComponent<Rigidbody>().velocity);
 						controllers[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
 					}
 					deltaTime = 0;
@@ -98,10 +98,10 @@ namespace Assets.Scripts.Data
 				if(!matchTimer.On) {
 					for(int i = 0; i < controllers.Count; i++) {
 						controllers[i].GetComponent<Rigidbody>().velocity = pausedVelocities[i];
-						pausedVelocities.RemoveAt(i);
 					}
-					deltaTime = Time.deltaTime;
+					pausedVelocities.Clear();
 					matchTimer.On = true;
+					deltaTime = Time.deltaTime;
 				}
 			}
 		}
