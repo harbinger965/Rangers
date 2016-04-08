@@ -108,7 +108,6 @@ namespace Assets.Scripts.Player
 		void Update() 
 		{
 			if(!kneeL.enabled) {
-				Debug.Log(legColliderReEnabler);
 				legColliderReEnabler -= Time.deltaTime;
 				if(legColliderReEnabler <= 0) {
 					kneeL.enabled = true;
@@ -243,6 +242,19 @@ namespace Assets.Scripts.Player
 		public bool FacingRight 
 		{
 			get { return facingRight; }
+			set 
+			{
+				if (animator.GetFloat("RunSpeed") == 0)
+				{
+					facingRight = value;
+					float motion = 0.01f;
+					if (!value)
+					{
+						motion = -motion;
+					}
+					animator.SetFloat("RunSpeed", motion);
+				}
+			}
 		}
 
         public bool Grappling

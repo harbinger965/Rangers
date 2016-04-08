@@ -243,5 +243,14 @@ namespace Assets.Scripts.Player
             get { return permanentTypes; }
             set { permanentTypes = value; }
         }
+
+		/// <summary>
+		/// Gets the current angle that the bow is aimed at.
+		/// </summary>
+		/// <returns>The current angle that the bow is aimed at.</returns>
+		public float GetAimAngle()
+		{
+			return Vector3.Angle(firePoint.position - bowPosition.position, Vector3.right);
+		}
     }
 }

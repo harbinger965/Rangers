@@ -19,9 +19,9 @@ namespace Assets.Scripts.Player.AI
 		private float lastSpeed;
 
 		/// <summary> Timer for allowing the AI to turn. </summary>
-		private int turnTimer;
+		private float turnTimer;
 		/// <summary> Tick cooldown for the AI turning. </summary>
-		private const int TURNCOOLDOWN = 3;
+		private const float TURNCOOLDOWN = 0.25f;
 
 		/// <summary> The distance away from a ledge that the AI will tolerate. </summary>
 		private const float LEDGEGRABDISTANCE = 0.6f;
@@ -53,6 +53,13 @@ namespace Assets.Scripts.Player.AI
 		public void ChooseAction(AIController controller)
 		{
 			if (target == null) {
+				controller.SetRunInDirection(0);
+				return;
+			}
+			Controller targetController = target.GetComponent<Controller>();
+			if (targetController != null && targetController.LifeComponent.Health <= 0)
+			{
+				controller.SetRunInDirection(0);
 				return;
 			}
 
@@ -62,7 +69,7 @@ namespace Assets.Scripts.Player.AI
 			float currentTargetDistance = targetDistance;
 			Vector3 opponentOffset = target.transform.position - controller.transform.position;
 			Vector3 targetOffset = opponentOffset;
-			float distanceTolerance = 1f;
+			float distanceTolerance = targetDistance - 1;
 
 
 			// Check if there is a platform in the way of shooting.
@@ -76,6 +83,10 @@ namespace Assets.Scripts.Player.AI
 				float closestDistance = Mathf.Infinity;
 				// Find ledges on the obstructing platform.
 				BoxCollider[] children = hit.collider.GetComponentsInChildren<BoxCollider>();
+				if (children.Length == 1 && hit.collider.transform.parent != null)
+				{
+					children = hit.collider.transform.parent.GetComponentsInChildren<BoxCollider>();
+				}
 				bool foundBetween = false;
 				foreach (BoxCollider child in children)
 				{
@@ -95,7 +106,7 @@ namespace Assets.Scripts.Player.AI
 									Physics.Raycast(child.transform.position + Vector3.down * 0.5f + Vector3.right * edgeMultiplier, Vector3.down, 30, AIController.LAYERMASK))
 								{
 									// Don't target ledges that have already been jumped over.
-									if (currentDistance > LEDGEGRABDISTANCE || child.transform.position.y >= controller.transform.position.y)
+									if (currentDistance > LEDGEGRABDISTANCE || child.transform.position.y >= controller.transform.position.y + 0.75f)
 									{
 										blockingLedge = child.transform;
 										closestDistance = currentDistance;
@@ -109,20 +120,20 @@ namespace Assets.Scripts.Player.AI
 
 			Transform gapLedge = null;
 			RaycastHit under;
-			Physics.Raycast(controller.transform.position + Vector3.up * 0.5f, Vector3.down, out under, 30, AIController.LAYERMASK);
-			if (hit.collider == null)
+			Physics.Raycast(controller.transform.position + Vector3.up, Vector3.down, out under, 30, AIController.LAYERMASK);
+			if (blockingLedge == null)
 			{
 				// If the ranger and its target are not on the same platform, go to a nearby ledge.
 				RaycastHit underTarget;
-				Physics.Raycast(target.transform.position + Vector3.up * 0.5f, Vector3.down, out underTarget, 30, AIController.LAYERMASK);
+				Physics.Raycast(target.transform.position + Vector3.up, Vector3.down, out underTarget, 30, AIController.LAYERMASK);
 				if (under.collider != null && underTarget.collider != null && under.collider.gameObject != underTarget.collider.gameObject)
 				{
 					float closestLedgeDistance = Mathf.Infinity;
 					foreach (GameObject ledge in ledges)
 					{
 						float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
-						if (currentDistance < closestLedgeDistance && ledge.transform.position.y > controller.transform.position.y + 1 &&
-							BetweenX(ledge.transform, controller.transform, target.transform))
+						if (currentDistance < closestLedgeDistance && ledge.transform.position.y > controller.transform.position.y - 1 &&
+							BetweenX(ledge.transform, controller.transform, target.transform, 1))
 						{
 							gapLedge = ledge.transform;
 							closestLedgeDistance = currentDistance;
@@ -176,7 +187,7 @@ namespace Assets.Scripts.Player.AI
 				distanceTolerance = 0.1f;
 				targetOffset = closestVector;
 			}
-			Debug.DrawRay(controller.transform.position, targetOffset);
+			Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
 
 			// Check if the AI is falling to its death.
 			if (under.collider == null)
@@ -229,6 +240,10 @@ namespace Assets.Scripts.Player.AI
 			{
 				controller.SetRunInDirection(-targetOffset.x);
 			}
+			else if (opponentOffset == targetOffset && under.collider != null && (controller.ParkourComponent.FacingRight ^ opponentOffset.x > 0))
+			{
+				controller.ParkourComponent.FacingRight = opponentOffset.x > 0;
+			}
 			else
 			{
 				controller.runSpeed = 0;
@@ -270,7 +285,8 @@ namespace Assets.Scripts.Player.AI
 			if (controller.runSpeed > 0 && lastSpeed < 0 || controller.runSpeed < 0 && lastSpeed > 0)
 			{
 				// Check if the AI turned very recently to avoid thrashing.
-				if (turnTimer-- <= 0) {
+				turnTimer -= Time.deltaTime;
+				if (turnTimer <= 0) {
 					turnTimer = TURNCOOLDOWN;
 				} else {
 					controller.runSpeed = 0;
@@ -290,9 +306,16 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="middle">The object to check for being between two others.</param>
 		/// <param name="limit1">One object to be between.</param>
 		/// <param name="limit2">The other object to be between.</param>
-		private bool BetweenX(Transform middle, Transform limit1, Transform limit2)
+		/// <param name="tolerance>Tolerance for how far the object can be outside the bounds.</param>
+		private bool BetweenX(Transform middle, Transform limit1, Transform limit2, int tolerance = 0)
 		{
-			return Mathf.Sign(middle.position.x - limit1.position.x) != Mathf.Sign(middle.position.x - limit2.position.x);
+			if (limit2.position.x < limit1.position.x)
+			{
+				Transform temp = limit1;
+				limit1 = limit2;
+				limit2 = temp;
+			}
+			return Mathf.Sign(middle.position.x - (limit1.position.x - tolerance)) != Mathf.Sign(middle.position.x - (limit2.position.x + tolerance));
 		}
 	}
 }
