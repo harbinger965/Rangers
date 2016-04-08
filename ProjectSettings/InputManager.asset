@@ -2010,7 +2010,7 @@ InputManager:
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: u
+    positiveButton: q
     altNegativeButton: 
     altPositiveButton: 
     gravity: 3
@@ -2026,7 +2026,7 @@ InputManager:
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: i
+    positiveButton: e
     altNegativeButton: 
     altPositiveButton: 
     gravity: 3

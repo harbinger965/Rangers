@@ -16,6 +16,8 @@ public class InGamePlayerInfoUI : MonoBehaviour {
 
 	private Image token1, token2, token3;
 
+	private int prevNumTypes;
+
 	// Use this for initialization
 	void Start () {
 		tagText = transform.FindChild("TagBox").GetChild(0).gameObject;
@@ -88,6 +90,24 @@ public class InGamePlayerInfoUI : MonoBehaviour {
 					}
 				}
 			}
+
+			if(prevNumTypes != numTypes) {
+				token1.transform.localScale = Vector3.one*2f;
+				token2.transform.localScale = Vector3.one*2f;
+				token3.transform.localScale = Vector3.one*2f;
+				token1.transform.parent.localScale = Vector3.one*2f;
+				token2.transform.parent.localScale = Vector3.one*2f;
+				token3.transform.parent.localScale = Vector3.one*2f;
+			} else {
+				token3.transform.localScale = Vector3.MoveTowards(token3.transform.localScale,Vector3.one,Time.deltaTime);
+				token3.transform.parent.localScale = Vector3.MoveTowards(token3.transform.parent.localScale,Vector3.one,Time.deltaTime*3f);
+				token2.transform.localScale = Vector3.MoveTowards(token2.transform.localScale,Vector3.one,Time.deltaTime*2f);
+				token2.transform.parent.localScale = Vector3.MoveTowards(token2.transform.parent.localScale,Vector3.one,Time.deltaTime*3f);
+				token1.transform.localScale = Vector3.MoveTowards(token1.transform.localScale,Vector3.one,Time.deltaTime*3f);
+				token1.transform.parent.localScale = Vector3.MoveTowards(token1.transform.parent.localScale,Vector3.one,Time.deltaTime*3f);
+			}
+
+			prevNumTypes = numTypes;
 				
 			if(GameManager.instance.CurrentWinner == id) crownIcon.SetActive(true);
 			else crownIcon.SetActive(false);
