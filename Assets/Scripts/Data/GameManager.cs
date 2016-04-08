@@ -88,7 +88,7 @@ namespace Assets.Scripts.Data
 				if(matchTimer.On) {
 					for(int i = 0; i < controllers.Count; i++) {
 						pausedVelocities.Insert(i,controllers[i].GetComponent<Rigidbody>().velocity);
-						controllers[i].GetComponent<Rigidbody>().velocity = 0f;
+						controllers[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
 					}
 					deltaTime = 0;
 					matchTimer.On = false;
