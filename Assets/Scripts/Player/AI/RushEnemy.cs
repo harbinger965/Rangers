@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using Assets.Scripts.Tokens;
 
 namespace Assets.Scripts.Player.AI
 {
@@ -21,7 +22,7 @@ namespace Assets.Scripts.Player.AI
 		/// <summary> Timer for allowing the AI to turn. </summary>
 		private float turnTimer;
 		/// <summary> Tick cooldown for the AI turning. </summary>
-		private const float TURNCOOLDOWN = 0.25f;
+		private const float TURNCOOLDOWN = 0.5f;
 
 		/// <summary> The distance away from a ledge that the AI will tolerate. </summary>
 		private const float LEDGEGRABDISTANCE = 0.6f;
@@ -71,7 +72,6 @@ namespace Assets.Scripts.Player.AI
 			Vector3 targetOffset = opponentOffset;
 			float distanceTolerance = targetDistance - 1;
 
-
 			// Check if there is a platform in the way of shooting.
 			RaycastHit hit;
 			controller.HasClearShot(opponentOffset, out hit);
@@ -106,7 +106,7 @@ namespace Assets.Scripts.Player.AI
 									Physics.Raycast(child.transform.position + Vector3.down * 0.5f + Vector3.right * edgeMultiplier, Vector3.down, 30, AIController.LAYERMASK))
 								{
 									// Don't target ledges that have already been jumped over.
-									if (currentDistance > LEDGEGRABDISTANCE || child.transform.position.y >= controller.transform.position.y + 0.75f)
+									if ((currentDistance > LEDGEGRABDISTANCE * 2 / 3 || child.transform.position.y >= controller.transform.position.y + 1.5f || BetweenX(blockingLedge, target.transform, child.transform)) && child.transform.position.y < controller.transform.position.y + 5)
 									{
 										blockingLedge = child.transform;
 										closestDistance = currentDistance;
@@ -123,20 +123,33 @@ namespace Assets.Scripts.Player.AI
 			Physics.Raycast(controller.transform.position + Vector3.up, Vector3.down, out under, 30, AIController.LAYERMASK);
 			if (blockingLedge == null)
 			{
-				// If the ranger and its target are not on the same platform, go to a nearby ledge.
-				RaycastHit underTarget;
-				Physics.Raycast(target.transform.position + Vector3.up, Vector3.down, out underTarget, 30, AIController.LAYERMASK);
-				if (under.collider != null && underTarget.collider != null && under.collider.gameObject != underTarget.collider.gameObject)
+				if (hit.collider != null || !Physics.Raycast(controller.transform.position + Vector3.right * Mathf.Sign(opponentOffset.x), Vector3.down, out under, 30, AIController.LAYERMASK))
 				{
-					float closestLedgeDistance = Mathf.Infinity;
-					foreach (GameObject ledge in ledges)
+					// If the ranger and its target are not on the same platform, and there's a gap between, go to a nearby ledge.
+					RaycastHit underTarget;
+					Physics.Raycast(target.transform.position + Vector3.up, Vector3.down, out underTarget, 30, AIController.LAYERMASK);
+					if (under.collider == null)
 					{
-						float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
-						if (currentDistance < closestLedgeDistance && ledge.transform.position.y > controller.transform.position.y - 1 &&
-							BetweenX(ledge.transform, controller.transform, target.transform, 1))
+						Physics.Raycast(controller.transform.position + Vector3.up + Vector3.right, Vector3.down, out under, 30, AIController.LAYERMASK);
+					}
+					if (under.collider == null)
+					{
+						Physics.Raycast(controller.transform.position + Vector3.up + Vector3.left, Vector3.down, out under, 30, AIController.LAYERMASK);
+					}
+					if (under.collider != null && underTarget.collider != null && under.collider.gameObject != underTarget.collider.gameObject)
+					{
+						float closestLedgeDistance = Mathf.Infinity;
+						foreach (GameObject ledge in ledges)
 						{
-							gapLedge = ledge.transform;
-							closestLedgeDistance = currentDistance;
+							float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
+							bool between = hit.collider != null || BetweenX(ledge.transform, controller.transform, target.transform, 1);
+							if (currentDistance < closestLedgeDistance && 
+								ledge.transform.position.y > controller.transform.position.y - 1 && ledge.transform.position.y < controller.transform.position.y + 5 &&
+								between)
+							{
+								gapLedge = ledge.transform;
+								closestLedgeDistance = currentDistance;
+							}
 						}
 					}
 				}
@@ -163,6 +176,8 @@ namespace Assets.Scripts.Player.AI
 				}
 			}
 
+			Debug.Log(blockingLedge + ":" + gapLedge + ":" + closestLedge);
+
 			if (closestLedge != null)
 			{
 				// Move towards the nearest ledge, jumping if needed.
@@ -186,6 +201,11 @@ namespace Assets.Scripts.Player.AI
 				currentTargetDistance = 0;
 				distanceTolerance = 0.1f;
 				targetOffset = closestVector;
+			}
+			else if (Physics.Raycast(controller.transform.position + Vector3.up * 0.1f, opponentOffset, Vector3.Magnitude(opponentOffset), AIController.LAYERMASK))
+			{
+				// Jump when just below a ledge with the target in sight.
+				controller.jump = true;
 			}
 			Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
 
@@ -294,7 +314,7 @@ namespace Assets.Scripts.Player.AI
 			}
 
 			// Jump to reach some tokens.
-			if (targetDistance == 0 && controller.runSpeed == 0) {
+			if (targetDistance == 0 && controller.runSpeed == 0 && target.GetComponent<ArrowToken>()) {
 				controller.jump = true;
 			}
 		}
@@ -307,8 +327,12 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="limit1">One object to be between.</param>
 		/// <param name="limit2">The other object to be between.</param>
 		/// <param name="tolerance>Tolerance for how far the object can be outside the bounds.</param>
-		private bool BetweenX(Transform middle, Transform limit1, Transform limit2, int tolerance = 0)
+		private bool BetweenX(Transform middle, Transform limit1, Transform limit2, float tolerance = 0)
 		{
+			if (middle == null || limit1 == null || limit2 == null)
+			{
+				return false;
+			}
 			if (limit2.position.x < limit1.position.x)
 			{
 				Transform temp = limit1;

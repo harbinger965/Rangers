@@ -56,10 +56,10 @@ public class MapSelector : MonoBehaviour {
 	private string GetBattleStageName() {
 		Enums.BattleStages stage = (Enums.BattleStages)currentSelectedMap;
 		switch (stage) {
-		case Enums.BattleStages.ProLeagueStandard: return "Pro League Standard";
 		case Enums.BattleStages.ProLeagueVariant1: return "Pro League Variant 1";
 		case Enums.BattleStages.ProLeagueVariant2: return "Pro League Variant 2";
-		default: return stage.ToString();
+		case Enums.BattleStages.ProLeagueVariant3: return "Pro League Variant 3";
+		default: return AddSpaces(stage.ToString());
 		}
 	}
 
@@ -71,8 +71,26 @@ public class MapSelector : MonoBehaviour {
 	private string GetTargetStageName() {
 		Enums.TargetPracticeStages stage = (Enums.TargetPracticeStages)currentSelectedMap;
 		switch (stage) {
-		case Enums.TargetPracticeStages.MagneticDistortion: return "Magnetic Distortion";
-		default: return stage.ToString();
+		default: return AddSpaces(stage.ToString());
 		}
+	}
+
+	/// <summary>
+	/// Adds spaces to a camel-case name.
+	/// </summary>
+	/// <returns>The name with spaces added to it.</returns>
+	/// <param name="name">The name to add spaces to.</param>
+	private string AddSpaces(string name)
+	{
+		for (int i = name.Length - 1; i > 0; i--)
+		{
+			int letter = (int)name[i];
+			if (letter >= 65 && letter <= 90)
+			{
+				// Capital letters.
+				name = name.Insert(i, " ");
+			}
+		}
+		return name;
 	}
 }
