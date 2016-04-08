@@ -32,14 +32,16 @@ namespace Assets.Scripts.Player
         /// <param name="id">The player who dealt the damage</param>
         public void ModifyHealth(float delta, PlayerID id = PlayerID.None)
         {
-			if(id != PlayerID.None) lastAttacker = id;
-			if (delta < 0)
-				Camera.main.GetComponent<PerlinShake>().PlayShake();
+			if(id != PlayerID.None) {
+				lastAttacker = id;
+				StatisticManager.instance.statistics[id].arrowsHit++;
+			}
+            if (delta < 0)
+                Camera.main.GetComponent<PerlinShake>().PlayShake();
             if (health > 0)
             {
                 health = Mathf.Clamp((health + delta), 0, MAX_HEALTH);
 				if (health <= 0) Die();
-                //controller.InvincibleFrames = Controller.INVINCIBLE_FRAMES;
             }
         }
 
