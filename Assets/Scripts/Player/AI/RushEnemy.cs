@@ -423,7 +423,14 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="ledge">The ledge to get a platform for.</param>
 		private GameObject GetLedgePlatform(LedgeNode ledge)
 		{
-			return ledge.transform.parent.parent.gameObject;
+			if (ledge.transform.parent.parent != null)
+			{
+				return ledge.transform.parent.parent.gameObject;
+			}
+			else
+			{
+				return ledge.transform.parent.gameObject;
+			}
 		}
 
 		/// <summary>
