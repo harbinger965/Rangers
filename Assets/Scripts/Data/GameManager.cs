@@ -54,7 +54,7 @@ namespace Assets.Scripts.Data
 
         private int numDead = 0;
 
-		private bool paused = false;
+		private bool paused = false, recentPause;
 		public float deltaTime = 0f;
 		private List<Vector3> pausedVelocities;
 
@@ -84,24 +84,31 @@ namespace Assets.Scripts.Data
 
 		void Update()
 		{
-			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) paused = !paused;
+			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) {
+				paused = !paused;
+				recentPause = true;
+			}
 			if(paused) {
-				if(matchTimer.On) {
+				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						pausedVelocities.Add(controllers[i].GetComponent<Rigidbody>().velocity);
 						controllers[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
+						controllers[i].GetComponent<Rigidbody>().useGravity = false;
 					}
 					deltaTime = 0;
-					matchTimer.On = false;
+					if(matchTimer) matchTimer.On = false;
+					recentPause = false;
 				}
 			} else {
-				if(!matchTimer.On) {
+				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						controllers[i].GetComponent<Rigidbody>().velocity = pausedVelocities[i];
+						controllers[i].GetComponent<Rigidbody>().useGravity = true;
 					}
 					pausedVelocities.Clear();
-					matchTimer.On = true;
+					if(matchTimer) matchTimer.On = true;
 					deltaTime = Time.deltaTime;
+					recentPause = false;
 				}
 			}
 		}

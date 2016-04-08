@@ -429,6 +429,7 @@ namespace Assets.Scripts.UI
 			menuTitle.SetActive(true);
 		}
 
+
         public void CallSinglePlayer()
         {
             state = Enums.UIStates.SinglePlayer;
