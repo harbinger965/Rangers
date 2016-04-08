@@ -39,9 +39,9 @@ namespace Assets.Scripts.Player
 					0) * distanceToPlayer;
 
 				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,id)) parkour.Jump();
-				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B,id)) parkour.SlideOn();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.RightBumper, id)) parkour.SlideRight();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.LeftBumper, id)) parkour.SlideLeft();
                 if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
-                else parkour.SlideOff();
 
 				if(Vector3.Magnitude(aim) > 0f && !clickFire)
 	            {

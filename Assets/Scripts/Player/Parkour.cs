@@ -6,16 +6,18 @@ namespace Assets.Scripts.Player
 {
 	public class Parkour : ControllerObject 
 	{
+		private const float FALL_THRESHOLD = 0.05f;
 
 		private bool facingRight = true;
-		private bool jumping = false;
 		//private bool ledgeGrabbing = false;
-		private bool sliding = false;
         private bool grappling = false;
+		private bool doubleJump = false;
 
 		private GameObject IKThingy;
 
+		private float fallingTime;
 		private float slidingTime;
+		private float slidingCooldown;
 		private float lastMotion;
 		private float jumpingTimeOffset;
 
@@ -40,46 +42,47 @@ namespace Assets.Scripts.Player
 
 		public void Locomote(float motion) 
 		{
-			transform.rotation = new Quaternion(0, transform.rotation.y, 0, transform.rotation.w);
-			if(motion > 0) 
+			if(slidingTime <= 0)
 			{
-				facingRight = true;
-			} 
-			else if (motion < 0) 
-			{
-				facingRight = false;
-			}
-			else
-			{
-				facingRight = !animator.GetCurrentAnimatorStateInfo(0).IsTag("Left");
-			}
-			if (animator.GetBool("CanMove"))
-			{
-   				if(facingRight && Physics.Raycast(new Ray(transform.position + new Vector3(0.2f, 0, 0), Vector3.up),2.5f, (1 << LayerMask.NameToLayer("Ground")))) 
+				transform.rotation = new Quaternion(0, transform.rotation.y, 0, transform.rotation.w);
+				if(motion > 0) 
 				{
-					animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
+					facingRight = true;
 				} 
-				else if(!facingRight && Physics.Raycast(new Ray(transform.position - new Vector3(0.2f, 0, 0), Vector3.up), 2.5f, (1 << LayerMask.NameToLayer("Ground"))))
+				else if (motion < 0) 
 				{
-					animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
-				} 
-				else 
+					facingRight = false;
+				}
+				else
 				{
-					if(!jumping) 
+					facingRight = !animator.GetCurrentAnimatorStateInfo(0).IsTag("Left");
+				}
+				if (animator.GetBool("CanMove"))
+				{
+	   				if(facingRight && Physics.Raycast(new Ray(transform.position + new Vector3(0.2f, 0, 0), Vector3.up),2.5f, (1 << LayerMask.NameToLayer("Ground")))) 
 					{
-						animator.SetFloat("RunSpeed", motion);
-						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*8);
+						animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
+					} 
+					else if(!facingRight && Physics.Raycast(new Ray(transform.position - new Vector3(0.2f, 0, 0), Vector3.up), 2.5f, (1 << LayerMask.NameToLayer("Ground"))))
+					{
+						animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
 					} 
 					else 
 					{
-						animator.SetFloat("RunSpeed", motion);
-						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*6);
+						if(fallingTime < FALL_THRESHOLD) 
+						{
+							animator.SetFloat("RunSpeed", motion);
+							rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*8);
+						} 
+						else 
+						{
+							animator.SetFloat("RunSpeed", motion);
+							rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*6);
+						}
 					}
 				}
+				lastMotion = motion;
 			}
-			lastMotion = motion;
-			AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-			sliding = state.IsName("Slide") || state.IsName("SlideLeft");
 		}
 
 		public void Jump()
@@ -88,7 +91,7 @@ namespace Assets.Scripts.Player
             {
                 GetComponent<Grapple>().Ungrapple();
             }
-			else if(!jumping) 
+			else if(fallingTime < FALL_THRESHOLD || doubleJump) 
 			{
 				animator.ResetTrigger("Land");
 				if(facingRight)
@@ -99,8 +102,8 @@ namespace Assets.Scripts.Player
 				{
 					animator.SetTrigger("JumpLeft");
 				}
-				jumping = true;
 				jumpingTimeOffset = 0.1f;
+				doubleJump = false;
 				SFXManager.instance.PlayJump();
 			}
 		}
@@ -118,60 +121,82 @@ namespace Assets.Scripts.Player
 				}
 			}
 			jumpingTimeOffset -= Time.deltaTime;
-			//			if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide")) {
-			////				transform.Translate(Vector3.right*lastMotion*Time.deltaTime*16f, Space.World);
-			//				sliding = true;
-			////				if(animator.IsInTransition(0)) {
-			////					lastMotion -= Time.deltaTime;
-			////				}
-			//			} else if(animator.GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
-			////				transform.Translate(-Vector3.left*lastMotion*Time.deltaTime*16f, Space.World);
-			//				sliding = true;
-			////				if(animator.IsInTransition(0)) {
-			////					lastMotion += Time.deltaTime;
-			////				}
-			//			} else {
-			//				sliding = false;
-			//			}
-			//			if((facingRight && !Physics.Raycast(new Ray(transform.position, transform.forward),0.5f,~(1<<9)))
-			//				|| (!facingRight && !Physics.Raycast(new Ray(transform.position, -transform.forward),0.5f,~(1<<9)))) {
-			//
-			//				if((animator.GetAnimatorTransitionInfo(0).IsName("WalkRunRight -> Slide")
-			//					|| animator.GetAnimatorTransitionInfo(0).IsName("WalkRunLeft -> SlideLeft"))
-			//					&& !animator.IsInTransition(0)) {
-			//					sliding = true;
-			//					transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*8f);
-			//				} else if(animator.GetAnimatorTransitionInfo(0).IsName("Slide -> WalkRunRight")) {
-			//					sliding = false;
-			//					transform.Translate(Vector3.forward*Time.deltaTime*8);
-			//				} else if(animator.GetAnimatorTransitionInfo(0).IsName("SlideLeft -> WalkRunLeft")) {
-			//					sliding = false;
-			//					transform.Translate(-Vector3.forward*Time.deltaTime*8);
-			//				} else if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide") || animator.GetCurrentAnimatorStateInfo(0).IsName("SlideLeft")) {
-			//					if(!animator.IsInTransition(0)) {
-			//						transform.Translate(Vector3.forward*lastMotion*Time.deltaTime*10);
-			//						rigidbody.AddForce(Vector3.down*10f, ForceMode.Acceleration);
-			//					}
-			//				}
-			//
-			//			}
 
 
+			animator.SetBool("Falling", fallingTime >= FALL_THRESHOLD);
+			if(fallingTime < FALL_THRESHOLD)
+			{
+				bool onGround = false;
+				RaycastHit[] hits = Physics.SphereCastAll(transform.position, 0.1f, -transform.up, 0.2f);
+				foreach(RaycastHit hit in hits)
+				{
+					if(hit.collider.gameObject.tag.Equals("Ground")) {
+						onGround = true;
+						break;
+					}
+				}
+				if(!onGround)
+				{
+					fallingTime += Time.deltaTime;
+				}
+			}
+
+
+			slidingTime = Mathf.Max(0, slidingTime - Time.deltaTime);
+			slidingCooldown = Mathf.Max(0, slidingCooldown - Time.deltaTime);
+			if(slidingTime <= 0) 
+			{
+				SlideOff();
+			}
 		}
 
 		public void SlideVelocity() 
 		{
-			rigidbody.velocity = Vector3.right*lastMotion*10f;
+			float direction = facingRight ? 1 : -1;
+			rigidbody.velocity = Vector3.right*direction*10f;
 		}
 
 		public void SlideOn() 
 		{
-			animator.SetBool("Slide", true);
+			if(facingRight) {
+				SlideRight();
+			} else {
+				SlideLeft();
+			}
 		}
 
-		public void SlideOff() 
+		public void SlideRight() 
 		{
+			if(slidingCooldown <= 0 && fallingTime < FALL_THRESHOLD) {
+				animator.SetFloat("RunSpeed", 1);
+				facingRight = true;
+				slidingTime = 1;
+				slidingCooldown = 1.2f*slidingTime;
+				animator.SetBool("Slide", true);
+				animator.SetBool("CanMove", false);
+				SlideVelocity();
+			}
+		}
+
+		public void SlideLeft() 
+		{
+			if(slidingCooldown <= 0 && fallingTime < FALL_THRESHOLD) {
+				animator.SetFloat("RunSpeed", -1);
+				facingRight = false;
+				slidingTime = 1;
+				slidingCooldown = 1.2f*slidingTime;
+				animator.SetBool("Slide", true);
+				animator.SetBool("CanMove", false);
+				SlideVelocity();
+			}
+		}
+
+		public void SlideOff()
+		{
+			animator.SetBool("CanMove", true);
+			animator.SetFloat("RunSpeed", 0);
 			animator.SetBool("Slide", false);
+			rigidbody.velocity.Set(0, rigidbody.velocity.y, 0);
 		}
 
 		void OnAnimatorIK() 
@@ -195,7 +220,7 @@ namespace Assets.Scripts.Player
 				AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
 				if(!state.IsName("Jump") && !state.IsName("JumpLeft"))
 				{
-					jumping = false;
+					doubleJump = true;
 				}
 				//				if(!ledgeGrabbing) 
 				//				{
@@ -208,6 +233,7 @@ namespace Assets.Scripts.Player
 				//				ledgeGrabbing = false;
 				animator.SetIKPositionWeight(AvatarIKGoal.RightHand,0);
 				animator.SetIKPositionWeight(AvatarIKGoal.LeftHand,0);
+				doubleJump = false;
 			}
 		}
 
@@ -236,7 +262,7 @@ namespace Assets.Scripts.Player
 			if((animator.GetCurrentAnimatorStateInfo(0).IsName("Airtime") || animator.GetCurrentAnimatorStateInfo(0).IsName("AirtimeLeft")) && other.gameObject.tag.Equals("Ground")) 
 			{
 				animator.SetTrigger("Land");
-				jumping = false;
+				fallingTime = 0;
 			}
 		}
 
@@ -263,7 +289,7 @@ namespace Assets.Scripts.Player
 		/// <value><c>true</c> if sliding; otherwise, <c>false</c>.</value>
 		public bool Sliding
 		{
-			get { return sliding; }
+			get { return slidingTime > 0; }
 		}
 	}
 }
