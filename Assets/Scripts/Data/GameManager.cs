@@ -79,6 +79,7 @@ namespace Assets.Scripts.Data
             // Call Init
 			gameOverUI = GameObject.Find("GameOverUI");
 			gameOverUI.SetActive(false);
+			pausedVelocities = new List<Vector3>();
         }
 
 		void Update()
