@@ -56,6 +56,7 @@ namespace Assets.Scripts.Player
 			arrow.transform.FindChild("Model").GetComponent<TrailRenderer>().material.color = firePoint.GetComponent<SpriteRenderer>().color;
 			strength = 0;
 			SFXManager.instance.PlayArrowShoot();
+			StatisticManager.instance.statistics[controller.ID].arrowsShot++;
             ClearAllTokens();
 		}
 
