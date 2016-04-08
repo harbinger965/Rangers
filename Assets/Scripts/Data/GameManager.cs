@@ -13,7 +13,7 @@ namespace Assets.Scripts.Data
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-        public string settingsName = "Stock";
+        public string settingsName = "Stock.dat";
         /// <summary>
         /// Use a singleton instance to make sure there is only one
         /// </summary>

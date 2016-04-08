@@ -6,7 +6,7 @@
     public static class Enums
     {
         public enum Arrows { Normal, Fireball, Ice, Thunder, Acid, Ricochet, Ghost, ZeroGravity, Tracking, Lifesteal, Virus, Splitting, HeavyKnockback, RapidFire, Grappling, Teleporting, NumTypes }
-        public enum Tokens { Fireball, Ice, Thunder, Acid, Ricochet, Ghost, ZeroGravity, Tracking, Lifesteal, Virus, Splitting, HeavyKnockback, RapidFire, Grappling, Health, Teleporting, NumTypes }
+        public enum Tokens { Fireball, Ice, Thunder, Acid, Ricochet, Ghost, ZeroGravity, Tracking, Lifesteal, Virus, Splitting, HeavyKnockback, RapidFire, Grappling, Teleporting, Health, NumTypes }
         public enum GameType { Deathmatch, Stock, NumTypes }
         public enum RepetitionTimerSettings { Limited, Unlimited }
         public enum Frequency { None, Sparce, Infrequent, Average, Frequent, Abundant, NumTypes }        
