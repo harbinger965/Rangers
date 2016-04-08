@@ -68,12 +68,12 @@ namespace Assets.Scripts.Player
 					if(!jumping) 
 					{
 						animator.SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
+						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*8);
 					} 
 					else 
 					{
 						animator.SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
+						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*4);
 					}
 				}
 			}
