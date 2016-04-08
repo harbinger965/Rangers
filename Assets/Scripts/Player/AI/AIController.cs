@@ -158,7 +158,7 @@ namespace Assets.Scripts.Player.AI
 		/// <inheritdoc/>
 		internal override bool IsHoldingDown()
 		{
-			return true;
+			return false;
 		}
 
 		/// <summary>

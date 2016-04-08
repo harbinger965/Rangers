@@ -55,11 +55,11 @@ namespace Assets.Scripts.Player
 			}
 			if (animator.GetBool("CanMove"))
 			{
-   				if(facingRight && Physics.Raycast(new Ray(transform.position + new Vector3(0.2f, 0, 0), Vector3.up),2.5f,~(1<<9))) 
+   				if(facingRight && Physics.Raycast(new Ray(transform.position + new Vector3(0.2f, 0, 0), Vector3.up),2.5f, (1 << LayerMask.NameToLayer("Ground")))) 
 				{
 					animator.SetFloat("RunSpeed", Mathf.Min(0,motion));
 				} 
-				else if(!facingRight && Physics.Raycast(new Ray(transform.position - new Vector3(0.2f, 0, 0), Vector3.up), 2.5f,~(1<<9))) 
+				else if(!facingRight && Physics.Raycast(new Ray(transform.position - new Vector3(0.2f, 0, 0), Vector3.up), 2.5f, (1 << LayerMask.NameToLayer("Ground"))))
 				{
 					animator.SetFloat("RunSpeed", Mathf.Max(0,motion));
 				} 

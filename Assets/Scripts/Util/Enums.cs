@@ -12,7 +12,7 @@
         public enum Frequency { None, Sparce, Infrequent, Average, Frequent, Abundant, NumTypes }        
         public enum MenuDirections { Up, Down, Left, Right}
         public enum UIStates { Splash, Main, SinglePlayer, Multiplayer, Settings, Audio, Video, Signin, ArenaStandard, LevelSelect, ValueModifier, TargetLevelSelect, None}
-		public enum BattleStages { ProLeagueStandard, ProLeagueVariant1, ProLeagueVariant2, NumStages }
+        public enum BattleStages { ProLeagueStandard, ProLeagueVariant1, ProLeagueVariant2, ProLeagueVariant3, NumStages }
 		public enum TargetPracticeStages { Intro, MagneticDistortion, NumStages }
     }
 }

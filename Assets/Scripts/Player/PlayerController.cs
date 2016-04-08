@@ -43,8 +43,8 @@ namespace Assets.Scripts.Player
 				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
 				else parkour.SlideOff();
 
-				if(Vector3.Magnitude(aim) > 0f && !clickFire)
-				{
+				if(Vector3.Magnitude(aim) > ControllerManager.CUSTOM_DEADZONE && !clickFire)
+	            {
 					//if the joystick is pushed past the 50% mark in any direction, start aiming the bow
 					archery.UpdateFirePoint(aim);
 					fire = true;
@@ -96,7 +96,7 @@ namespace Assets.Scripts.Player
 		/// <inheritdoc/>
 		internal override bool IsHoldingDown()
 		{
-			return ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,ID) < -0.6;
+			return ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,ID) < ControllerManager.CUSTOM_DEADZONE;
 		}
 	}
 }
