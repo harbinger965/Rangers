@@ -36,6 +36,8 @@ namespace Assets.Scripts.Player
 				lastAttacker = id;
 				StatisticManager.instance.statistics[id].arrowsHit++;
 			}
+            if (delta < 0)
+                Camera.main.GetComponent<PerlinShake>().PlayShake();
             if (health > 0)
             {
                 health = Mathf.Clamp((health + delta), 0, MAX_HEALTH);
