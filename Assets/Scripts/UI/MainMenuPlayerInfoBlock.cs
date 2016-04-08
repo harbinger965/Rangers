@@ -99,6 +99,7 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 			tagText.color = ProfileManager.instance.GetProfile(playerID).SecondaryColor;
 			tagText.transform.parent.GetComponent<Image>().color = ProfileManager.instance.GetProfile(playerID).PrimaryColor;
 			HidePressToJoinGraphic();
+
 			playerNumIndicator.color = Color.white;
 		} else {
 			ShowNameCreator();
@@ -172,13 +173,19 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 
 	public void SetTag(string text) {
 		tagText.text = text;
-		if(!text.Contains("#")) {
+		if(text.Contains("AI")) {
 			playerNumIndicator.color = Color.white;
 			tagText.color = Color.red;
 			tagText.transform.parent.GetComponent<Image>().color = Color.black;
-		}
-		else {
+		} else if(!text.Contains("#")) {
+			if(ProfileManager.instance.ProfileExists(playerID)) {
+				tagText.color = ProfileManager.instance.GetProfile(playerID).SecondaryColor;
+				tagText.transform.parent.GetComponent<Image>().color = ProfileManager.instance.GetProfile(playerID).PrimaryColor;
+			}
+		} else {
 			playerNumIndicator.color = Color.red;
+			tagText.color = Color.red;
+			tagText.transform.parent.GetComponent<Image>().color = Color.black;
 		}
 	}
 
