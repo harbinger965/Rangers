@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 using Assets.Scripts.Data;
+using Assets.Scripts.Tokens;
+using Assets.Scripts.Util;
+using Assets.Scripts.Arrows;
 
 public class InGamePlayerInfoUI : MonoBehaviour {
 
@@ -10,6 +13,8 @@ public class InGamePlayerInfoUI : MonoBehaviour {
 	private GameObject tagText, indicatorsContainer, crownIcon;
 
 	private Text livesText, deathsText, killsText;
+
+	private Image token1, token2, token3;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +31,10 @@ public class InGamePlayerInfoUI : MonoBehaviour {
 		tagText.GetComponent<Text>().text = ProfileManager.instance.GetProfile(id).Name;
 		tagText.GetComponent<Text>().color = ProfileManager.instance.GetProfile(id).SecondaryColor;
 		tagText.transform.parent.GetComponent<Image>().color = ProfileManager.instance.GetProfile(id).PrimaryColor;
+
+		token1 = transform.FindChild("TokenDisplay").FindChild("Token 1").GetChild(0).GetComponent<Image>();
+		token2 = transform.FindChild("TokenDisplay").FindChild("Token 2").GetChild(0).GetComponent<Image>();
+		token3 = transform.FindChild("TokenDisplay").FindChild("Token 3").GetChild(0).GetComponent<Image>();
 
 		crownIcon = transform.FindChild("CrownIcon").gameObject;
 
@@ -45,6 +54,41 @@ public class InGamePlayerInfoUI : MonoBehaviour {
 			if(livesText) livesText.text = GameManager.instance.GetPlayer(id).LifeComponent.Lives.ToString();
 			if(deathsText) deathsText.text = GameManager.instance.GetPlayer(id).LifeComponent.Deaths.ToString();
 			if(killsText) killsText.text = GameManager.instance.GetPlayer(id).LifeComponent.kills.ToString();
+
+			token1.sprite = null;
+			token2.sprite = null;
+			token3.sprite = null;
+
+			token1.color = new Color(1,1,1,0.5f);
+			token2.color = new Color(1,1,1,0.5f);
+			token3.color = new Color(1,1,1,0.5f);
+
+			int numTypes = 0;
+			int types = GameManager.instance.GetPlayer(id).ArcheryComponent.ArrowTypes;
+			for(int i = 0; i < (int)Enums.Arrows.NumTypes; i++)
+			{
+				// Check to see if the type exists in the current arrow
+				if(Bitwise.IsBitOn(types, i) && ((Enums.Arrows)i) != Enums.Arrows.Normal)
+				{
+					// Add an arrow property and update the delegates
+					if(numTypes == 0) {
+						token1.sprite = TokenToSprite.instance.dict[(Enums.Arrows)i];
+						token1.color = Color.white;
+						numTypes++;
+					}
+					else if(numTypes == 1) {
+						token2.sprite = TokenToSprite.instance.dict[(Enums.Arrows)i];
+						token2.color = Color.white;
+						numTypes++;
+					}
+					else if(numTypes == 2) {
+						token3.sprite = TokenToSprite.instance.dict[(Enums.Arrows)i];
+						token3.color = Color.white;
+						numTypes++;
+					}
+				}
+			}
+				
 			if(GameManager.instance.CurrentWinner == id) crownIcon.SetActive(true);
 			else crownIcon.SetActive(false);
 		}
