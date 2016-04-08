@@ -96,7 +96,7 @@ namespace Assets.Scripts.Player
 		/// <inheritdoc/>
 		internal override bool IsHoldingDown()
 		{
-			return ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,ID) < ControllerManager.CUSTOM_DEADZONE;
+			return ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,ID) < -3 * ControllerManager.CUSTOM_DEADZONE;
 		}
 	}
 }
