@@ -58,7 +58,6 @@ public class MapSelector : MonoBehaviour {
 		switch (stage) {
 		case Enums.BattleStages.ProLeagueVariant1: return "Pro League Variant 1";
 		case Enums.BattleStages.ProLeagueVariant2: return "Pro League Variant 2";
-		case Enums.BattleStages.ProLeagueVariant3: return "Pro League Variant 3";
 		default: return AddSpaces(stage.ToString());
 		}
 	}
