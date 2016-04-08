@@ -23,7 +23,7 @@ namespace Assets.Scripts.Player.AI
 		/// <summary> Timer for allowing the AI to turn. </summary>
 		private float turnTimer;
 		/// <summary> Tick cooldown for the AI turning. </summary>
-		private const float TURNCOOLDOWN = 0.5f;
+		private const float TURNCOOLDOWN = 1;
 
 		/// <summary> The distance away from a ledge that the AI will tolerate. </summary>
 		private const float LEDGEGRABDISTANCE = 0.6f;
@@ -230,18 +230,22 @@ namespace Assets.Scripts.Player.AI
 					{
 						nextOffset.y = 0;
 					}
-					controller.jump = currentOffset.y > -0.75 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE;
 
 					Vector3 platformOffset = currentNode.transform.position - GetLedgePlatform(currentNode).transform.position;
 
-					if (platformOffset.x > 0)
+					if (currentOffset.y > -2)
 					{
-						currentOffset.x += LEDGEGRABDISTANCE;
+						if (platformOffset.x > 0)
+						{
+							currentOffset.x += LEDGEGRABDISTANCE;
+						}
+						else
+						{
+							currentOffset.x -= LEDGEGRABDISTANCE;
+						}
 					}
-					else
-					{
-						currentOffset.x -= LEDGEGRABDISTANCE;
-					}
+
+					controller.jump = currentOffset.y > -0.75 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE / 2;
 
 					targetOffset = currentOffset;
 				}
@@ -319,10 +323,10 @@ namespace Assets.Scripts.Player.AI
 			{
 				// Don't chase an opponent off the map.
 				Vector3 offsetPosition = controller.transform.position;
-				offsetPosition.x += controller.runSpeed;
+				offsetPosition.x += controller.runSpeed / 2;
 				offsetPosition.y += 0.5f;
 				Vector3 offsetPosition3 = offsetPosition;
-				offsetPosition3.x += controller.runSpeed * 2;
+				offsetPosition3.x += controller.runSpeed;
 				if (!Physics.Raycast(offsetPosition, Vector3.down, out hit, 30, AIController.LAYERMASK) &&
 					!Physics.Raycast(offsetPosition3, Vector3.down, out hit, 30, AIController.LAYERMASK))
 				{
@@ -339,7 +343,8 @@ namespace Assets.Scripts.Player.AI
 				else
 				{
 					// Slide if the opponent is far enough away for sliding to be useful.
-					controller.slide = horizontalDistance > this.targetDistance * 3 && currentNode == null;
+					controller.ParkourComponent.FacingRight = opponentOffset.x > 0;
+					controller.slide = horizontalDistance > this.targetDistance * 2 && currentNode == null;
 				}
 			}
 
@@ -440,10 +445,6 @@ namespace Assets.Scripts.Player.AI
 			if (currentLedges.Length == 0 && platformHit.collider.transform.parent != null)
 			{
 				currentLedges = platformHit.collider.transform.parent.GetComponentsInChildren<LedgeNode>();
-			}
-			if (currentLedges.Length == 0)
-			{
-				Debug.Log(platformHit.collider);
 			}
 			return currentLedges;
 		}

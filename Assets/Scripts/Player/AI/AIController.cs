@@ -50,7 +50,7 @@ namespace Assets.Scripts.Player.AI
 		private float defaultMoveSpeed = 1;
 
 		/// <summary> Layer mask for raycasting platforms. </summary>
-		internal const int LAYERMASK = 1 | 1 << 13 | 1 << 15;
+		internal const int LAYERMASK = 1 << 13 | 1 << 15;
 
 		/// <summary>
 		/// Initializes the AI policy to use.
