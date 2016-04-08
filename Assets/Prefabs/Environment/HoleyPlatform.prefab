@@ -158,7 +158,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 477574}
   - 65: {fileID: 6506650}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Ledge2
   m_TagString: Ledge
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 418506}
   - 65: {fileID: 6551304}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: GameObject (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +207,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 423004}
   - 65: {fileID: 6549954}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Ledge1
   m_TagString: Ledge
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 489344}
   - 65: {fileID: 6546376}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}

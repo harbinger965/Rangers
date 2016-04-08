@@ -132,12 +132,12 @@ namespace Assets.Scripts.Player
 		protected void GrabToken()
 		{
 			if (!ArcheryComponent.CanCollectToken()) return;
-			Collider[] cols = Physics.OverlapSphere(transform.position + new Vector3(0, 2.5f, 0), 1f);
+			Collider[] cols = Physics.OverlapSphere(transform.position + new Vector3(0, 0.75f, 0), 1f);
 			for(int i = 0; i < cols.Length; i++)
 			{
-				if(cols[i].GetComponent<ArrowToken>() != null)
+				ArrowToken t = cols[i].GetComponent<ArrowToken>();
+				if(t != null)
 				{
-					ArrowToken t = cols[i].GetComponent<ArrowToken>();
 					if (!Util.Bitwise.IsBitOn(ArcheryComponent.ArrowTypes, (int)t.Type))
 					{
 						t.TokenCollected(this);
