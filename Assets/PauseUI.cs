@@ -150,6 +150,7 @@ public class PauseUI : MonoBehaviour {
 	}
 
 	public void EndMatch() {
+		GameManager.instance.IsPaused = false;
 		GameManager.instance.GameOver();
 	}
 }
