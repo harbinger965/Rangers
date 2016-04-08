@@ -11,6 +11,13 @@ public class CameraFollow : MonoBehaviour
 	private int numPlayers;
 	private float greatestDistance;
 
+	private Vector3 targetPos;
+
+	public Vector3 TargetPos {
+		get { return targetPos;}
+		private set {targetPos = value;}
+	}
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -40,6 +47,7 @@ public class CameraFollow : MonoBehaviour
 				}
 			}
 			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y, (-1.1f)*(greatestDistance+4)), Time.deltaTime*speed);
+			targetPos = transform.position;
 		} else {
 			transform.position = Vector3.MoveTowards(transform.position, startingPos, Time.deltaTime*5f);
 		}
