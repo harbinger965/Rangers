@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Assets.Scripts.Data;
 
 namespace Assets.Scripts.Player
 {
@@ -30,7 +31,7 @@ namespace Assets.Scripts.Player
 			//updating fireRateTimer
 			fireRateTimer += Time.deltaTime;
 
-			if (life.Health > 0)
+			if (life.Health > 0 && !GameManager.instance.IsPaused)
 			{
 				//keeping track of this every frame to help prevent accidental fires or mis-aiming
 				Vector3 aim = new Vector3(
@@ -80,7 +81,7 @@ namespace Assets.Scripts.Player
 		void FixedUpdate() 
 		{
 			//This has to happen every fixed update as of now, can't think of a better way to handle it --kartik
-			if(life.Health > 0) 
+			if(life.Health > 0 && !GameManager.instance.IsPaused) 
 			{
 				parkour.Locomote(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id));
 			}

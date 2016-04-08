@@ -336,14 +336,13 @@ public class ControllerManager  {
 	public bool GetButtonAll(ControllerInputWrapper.Buttons button, bool isDown)
 	{
 		//This definitely needs an update........... Like seriously..
-		//        int i = 0;
-		//        foreach (ControllerInputWrapper cW in playerControls)
-		//        {
-		//            if (!cW.GetButton(button, i, isDown)){
-		//                return false;
-		//            }
-		//        }
-		//        return true;
+//        int i = 0;
+//        foreach (ControllerInputWrapper cW in playerControls)
+//        {
+//            if (!cW.GetButton(button, i, isDown)){
+//                return false;
+//            }
+//        }
 		return false;
 	}
 
