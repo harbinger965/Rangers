@@ -11,6 +11,8 @@ public class CameraFollow : MonoBehaviour
 	private int numPlayers;
 	private float greatestDistance;
 
+	private Camera blurCam;
+
 	private Vector3 targetPos;
 
 	public Vector3 TargetPos {
@@ -23,6 +25,10 @@ public class CameraFollow : MonoBehaviour
 	{
 		numPlayers = GameManager.instance.AllPlayers.Count;
 		startingPos = transform.position;
+		targetPos = startingPos;
+		if(transform.FindChild("BlurCam")) {
+			blurCam = transform.FindChild("BlurCam").GetComponent<Camera>();
+		}
 	}
 
 	// Update is called once per frame
@@ -48,6 +54,9 @@ public class CameraFollow : MonoBehaviour
 			}
 			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y, (-1.1f)*(greatestDistance+4)), Time.deltaTime*speed);
 			targetPos = transform.position;
+
+			if(blurCam) blurCam.fieldOfView = Mathf.MoveTowards(blurCam.fieldOfView,60f,Time.deltaTime*5f);
+			GetComponent<Camera>().fieldOfView = Mathf.MoveTowards(GetComponent<Camera>().fieldOfView,60f,Time.deltaTime*5f);
 		} else {
 			transform.position = Vector3.MoveTowards(transform.position, startingPos, Time.deltaTime*5f);
 		}

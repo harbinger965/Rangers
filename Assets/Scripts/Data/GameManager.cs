@@ -58,6 +58,8 @@ namespace Assets.Scripts.Data
 		public float deltaTime = 0f;
 		private List<Vector3> pausedVelocities;
 
+		public float countInTimer = 5f;
+
         // Sets up singleton instance. Will remain if one does not already exist in scene
         void Awake()
         {
@@ -84,7 +86,15 @@ namespace Assets.Scripts.Data
 
 		void Update()
 		{
-			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) {
+			if(countInTimer > 0) {
+				if(matchTimer) matchTimer.On = false;
+				countInTimer -= Time.deltaTime;
+			} else if(countInTimer != -100 && matchTimer && !matchTimer.On) {
+				matchTimer.On = false;
+				countInTimer = -100f;
+			}
+
+			if(!GameFinished && countInTimer <= 0 && ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) {
 				paused = !paused;
 				recentPause = true;
 			}
@@ -442,7 +452,7 @@ namespace Assets.Scripts.Data
 
 		public bool GameFinished
 		{
-			get {return gameOver; }
+			get {return gameOver || countInTimer > 0; }
 		}
 
 		public PlayerID CurrentWinner

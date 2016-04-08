@@ -52,10 +52,12 @@ namespace Assets.Scripts.Data
         /// <param name="tokenPrefab">The token to be spawned</param>
         private  void SpawnToken(GameObject tokenPrefab)
         {
-            tokenPrefab.transform.position = transform.position;
-            // Turn on token since pooling
-            tokenPrefab.SetActive(true);
-            spawnItem = tokenPrefab.GetComponent<Token>();
+			if(tokenPrefab != null) {
+	            tokenPrefab.transform.position = transform.position;
+	            // Turn on token since pooling
+	            tokenPrefab.SetActive(true);
+	            spawnItem = tokenPrefab.GetComponent<Token>();
+			}
         }
     }
 }
