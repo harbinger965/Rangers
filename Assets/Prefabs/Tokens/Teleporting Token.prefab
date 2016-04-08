@@ -164,7 +164,7 @@ GameObject:
   - 114: {fileID: 11488670}
   - 54: {fileID: 5488228}
   m_Layer: 8
-  m_Name: Teleport Token
+  m_Name: Teleporting Token
   m_TagString: Token
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -844,6 +844,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_LocalScale.z
       value: 0.1254801
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Name
+      value: Teleporting Token
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

@@ -45,9 +45,7 @@ namespace Assets.Scripts.Data
             tokens = new List<GameObject>();
             foreach(Enums.Tokens key in tokenDict.Keys)
             {
-                Debug.Log(key);
                 GameObject go = GameManager.instance.AllTokens.Find(x => x.name.StartsWith(key.ToString()));
-                if(go != null) Debug.Log(go.name);
                 if (go != null)
                 {
                     // Spawn a certain number of the same token based on its frequency
