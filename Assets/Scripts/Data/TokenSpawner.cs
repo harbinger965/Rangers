@@ -73,6 +73,7 @@ namespace Assets.Scripts.Data
         /// <returns>A token prefab</returns>
         public GameObject GetToken()
         {
+			if(GameManager.instance.IsPaused) return null;
             // Perform Fisher-Yates shuffling algorithm.
             // This is because we are pooling objects so getting a random token
             // means that if we pick a random token that is enabled, we should

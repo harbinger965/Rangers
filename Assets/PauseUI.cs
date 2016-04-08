@@ -5,6 +5,7 @@ using Assets.Scripts.Data;
 using Assets.Scripts.UI;
 using Assets.Scripts.Util;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class PauseUI : MonoBehaviour {
 
@@ -12,7 +13,10 @@ public class PauseUI : MonoBehaviour {
 
 	public bool pauseMenuOpen;
 
-	public Selectable startingButton;
+	public Selectable startingButton, controlsButton;
+
+	public GameObject controlsMenu;
+	public GameObject pauseButtons;
 
 	private float hTimer, vTimer, delay = 0.1f;
 	private bool dpadPressed;
@@ -32,6 +36,7 @@ public class PauseUI : MonoBehaviour {
 				pause3.rectTransform.anchoredPosition3D = Vector3.MoveTowards(pause3.rectTransform.anchoredPosition3D,Vector3.zero,pause3.rectTransform.anchoredPosition3D.y*Time.deltaTime);
 			}
 			Navigator.defaultGameObject = startingButton.gameObject;
+			if(!EventSystem.current.currentSelectedGameObject) EventSystem.current.SetSelectedGameObject(startingButton.gameObject);
 			// No axis is being pressed
 			if (ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX,PlayerID.One) == 0)
 			{
@@ -142,7 +147,15 @@ public class PauseUI : MonoBehaviour {
 	}
 
 	public void ControlsPressed() {
+		EventSystem.current.SetSelectedGameObject(controlsButton.gameObject);
+		pauseButtons.SetActive(false);
+		controlsMenu.SetActive(true);
+	}
 
+	public void BackFromControls() {
+		EventSystem.current.SetSelectedGameObject(startingButton.gameObject);
+		pauseButtons.SetActive(true);
+		controlsMenu.SetActive(false);
 	}
 
 	public void RestartMatch() {
