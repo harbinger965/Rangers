@@ -90,7 +90,7 @@ namespace Assets.Scripts.Data
 				if(matchTimer) matchTimer.On = false;
 				countInTimer -= Time.deltaTime;
 			} else if(countInTimer != -100 && matchTimer && !matchTimer.On) {
-				matchTimer.On = false;
+				matchTimer.On = true;
 				countInTimer = -100f;
 			}
 
@@ -284,21 +284,19 @@ namespace Assets.Scripts.Data
 				{
 					killer.LifeComponent.kills--;
 					StatisticManager.instance.statistics[killer.ID].suicides++;
-					return;
+				} else if (killer != null) {
+					killer.LifeComponent.kills++;
+
+					if(StatisticManager.instance.statistics[killer.ID].killedPlayer.ContainsKey(victim.ID))
+						StatisticManager.instance.statistics[killer.ID].killedPlayer[victim.ID]++;
+					else
+						StatisticManager.instance.statistics[killer.ID].killedPlayer.Add(victim.ID,1);
+
+					if(StatisticManager.instance.statistics[victim.ID].killedByPlayer.ContainsKey(killer.ID))
+						StatisticManager.instance.statistics[victim.ID].killedByPlayer[killer.ID]++;
+					else
+						StatisticManager.instance.statistics[victim.ID].killedByPlayer.Add(killer.ID,1);
 				}
-				if (killer == null) return;
-				killer.LifeComponent.kills++;
-
-				if(StatisticManager.instance.statistics[killer.ID].killedPlayer.ContainsKey(victim.ID))
-					StatisticManager.instance.statistics[killer.ID].killedPlayer[victim.ID]++;
-				else
-					StatisticManager.instance.statistics[killer.ID].killedPlayer.Add(victim.ID,1);
-
-				if(StatisticManager.instance.statistics[victim.ID].killedByPlayer.ContainsKey(killer.ID))
-					StatisticManager.instance.statistics[victim.ID].killedByPlayer[killer.ID]++;
-				else
-					StatisticManager.instance.statistics[victim.ID].killedByPlayer.Add(killer.ID,1);
-
 
 				// find the most kills
 				float maxNumKills = Mathf.NegativeInfinity;
