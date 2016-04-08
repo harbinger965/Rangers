@@ -276,12 +276,15 @@ namespace Assets.Scripts.Player.AI
 				float closestLedgeDistance = Mathf.Infinity;
 				foreach (LedgeNode ledge in ledges)
 				{
-					float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
-					if (currentDistance < closestLedgeDistance && ledge.transform.position.y < controller.transform.position.y + 1)
-					{
-						closestLedge = ledge;
-						closestLedgeDistance = currentDistance;
-					}
+                    if (ledge != null)
+                    {
+                        float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
+                        if (currentDistance < closestLedgeDistance && ledge.transform.position.y < controller.transform.position.y + 1)
+                        {
+                            closestLedge = ledge;
+                            closestLedgeDistance = currentDistance;
+                        }
+                    }
 				}
 				bool awayFromLedge = false;
 				if (closestLedge == null)
