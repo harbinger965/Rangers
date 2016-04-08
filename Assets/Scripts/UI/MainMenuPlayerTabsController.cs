@@ -91,6 +91,9 @@ public class MainMenuPlayerTabsController : MonoBehaviour {
 					newTag = "AI " + (i + 1);
 				} else {
 					newTag = infoBlocks[i + 1].GetTag();
+					if(!newTag.Contains("#")) {
+						infoBlocks[i].PlayerAdded();
+					}
 				}
 				infoBlocks[i].SetTag(newTag);
 			}

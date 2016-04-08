@@ -46,7 +46,7 @@ public class CameraFollow : MonoBehaviour
 					greatestDistance = tempDist;
 				}
 			}
-			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y - 2, (-1.1f)*(greatestDistance+4)), Time.deltaTime*speed);
+			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y, (-1.1f)*(greatestDistance+4)), Time.deltaTime*speed);
 			targetPos = transform.position;
 		} else {
 			transform.position = Vector3.MoveTowards(transform.position, startingPos, Time.deltaTime*5f);

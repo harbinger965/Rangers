@@ -34,6 +34,9 @@ namespace Assets.Scripts.Player
 		//Body parts for fun destruction
 		private List<RobotBodyPart> bodyParts;
 
+		public List<Material> playerMats;
+		public bool justDamaged;
+
         void Awake()
         {
             // Initialize all componenets
@@ -59,6 +62,7 @@ namespace Assets.Scripts.Player
 						rbp.GetComponent<MeshRenderer>().material.color = profile.SecondaryColor;
 						rbp.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", new Color(profile.SecondaryColor.r/3f,profile.SecondaryColor.g/3f, profile.SecondaryColor.b/3f));
 					}
+					playerMats.Add(rbp.GetComponent<MeshRenderer>().material);
 				}
 			}
         }
@@ -85,6 +89,18 @@ namespace Assets.Scripts.Player
 			{
 				LifeComponent.ModifyHealth(-100);
 			}
+			if(!justDamaged) {
+				if(playerMats[0].GetColor("_EmissionColor") == Color.red) {
+					for(int i = 0; i < playerMats.Count; i++) {
+						if(playerMats[i].name.Equals("PlayerMat1 (Instance)")) {
+							playerMats[i].SetColor("_EmissionColor", new Color(profile.PrimaryColor.r/3f,profile.PrimaryColor.g/3f, profile.PrimaryColor.b/3f));
+						} else {
+							playerMats[i].SetColor("_EmissionColor", new Color(profile.SecondaryColor.r/3f,profile.SecondaryColor.g/3f, profile.SecondaryColor.b/3f));
+						}
+					}
+				}
+			}
+			if(justDamaged) justDamaged = false;
 		}
 
         /// <summary>
