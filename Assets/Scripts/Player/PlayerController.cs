@@ -40,11 +40,9 @@ namespace Assets.Scripts.Player
 
 				// Poll Button input
 				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,id)) parkour.Jump();
-
-				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B,id)) parkour.SlideOn();
-				else parkour.SlideOff();
-
-				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.RightBumper, id)) parkour.SlideRight();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.LeftBumper, id)) parkour.SlideLeft();
+                if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
 
 				if(Vector3.Magnitude(aim) > ControllerManager.CUSTOM_DEADZONE && !clickFire)
 				{
