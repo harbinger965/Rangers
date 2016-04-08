@@ -688,7 +688,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doNotActivate:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 67584
   arrowhead: {fileID: 448754}
 --- !u!135 &13588904
 SphereCollider:
@@ -832,6 +832,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_StartWidth
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: doNotActivate.m_Bits
+      value: 67584
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
