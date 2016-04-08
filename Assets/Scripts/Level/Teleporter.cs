@@ -11,7 +11,7 @@ namespace Assets.Scripts.Levels
 
         void OnCollisionEnter(Collision other)
         {
-            other.collider.transform.position = portal.position;
+			other.collider.transform.root.position = portal.position - transform.forward;
         }
     }
 }

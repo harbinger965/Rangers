@@ -8,10 +8,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
   - enabled: 1
-    path: Assets/Scenes/ProStadiums/Ranger Dreams.unity
+    path: Assets/Scenes/ProStadiums/Ranger_Dreams.unity
   - enabled: 1
     path: Assets/Scenes/MatchSummary.unity
   - enabled: 1
     path: Assets/Scenes/ProStadiums/ProLeagueVariant1.unity
   - enabled: 1
     path: Assets/Scenes/ProStadiums/ProLeagueVariant2.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/Ranger_Dreams.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/SteamLords.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/The_Orbital_Belt.unity
