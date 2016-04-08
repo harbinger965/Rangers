@@ -222,6 +222,12 @@ namespace Assets.Scripts.Player
             return numTokens < 3;
         }
 
+		public int NumTokens {
+			get {
+				return numTokens;
+			}
+		}
+
 		public float StrengthPercentage
 		{
 			get { return strength/MAX_STRENGTH; }

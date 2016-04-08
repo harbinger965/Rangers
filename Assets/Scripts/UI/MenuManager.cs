@@ -45,10 +45,8 @@ namespace Assets.Scripts.UI
         {
             if(instance == null)
             {
-//                DontDestroyOnLoad(gameObject);
                 instance = this;
                 UpdatePanels(SplashPanel);
-				//ControllerManager manager = new ControllerManager();
             }
             else if (instance != this)
             {
@@ -64,7 +62,7 @@ namespace Assets.Scripts.UI
 				PlayerPanel.gameObject.SetActive(true);
 				PlayerPanel.SetAsFirstSibling();
 				menuTitle.SetActive(true);
-			}
+            }
 		}
 
         void Update()
@@ -117,17 +115,9 @@ namespace Assets.Scripts.UI
 			ControllerManager.instance.AddPlayer(ControllerInputWrapper.Buttons.Start);
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start, PlayerID.One))
             {
-//                if (GameManager.instance.AllPlayers.Count == 0)
-//                {
-//                    state = Enums.UIStates.Signin;
-//                    //UpdatePanels();
-//                }
-//                else
-//                {
-					state = Enums.UIStates.Signin;
-					UpdatePanels(SignInPanel);
+				state = Enums.UIStates.Signin;
+				UpdatePanels(SignInPanel);
 				SFXManager.instance.PlayAffirm();
-//                }
             }
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
@@ -255,6 +245,11 @@ namespace Assets.Scripts.UI
 			GameManager.lastLoadedLevel = selectedMap;
 			if(ProfileManager.instance.NumSignedIn() > 1) SceneManager.LoadScene(selectedMap, LoadSceneMode.Single);
 		}
+
+        public void GoToCredits()
+        {
+            SceneManager.LoadScene("Credits", LoadSceneMode.Single);
+        }
 
 		private void ValueModifier() {
 			if(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY, PlayerID.One) > ControllerManager.CUSTOM_DEADZONE

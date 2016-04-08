@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
+using Assets.Scripts.Data;
 
 namespace Assets.Scripts.Player
 {
-    /// <summary>
-    /// Class that handles player specific components of the controller
-    /// Uses input
-    /// </summary>
-    public class PlayerController : Controller
-    {
+	/// <summary>
+	/// Class that handles player specific components of the controller
+	/// Uses input
+	/// </summary>
+	public class PlayerController : Controller
+	{
 		//has the player drawn the bow back, and is ready to fire?
 		private bool fire;
 
@@ -24,13 +25,13 @@ namespace Assets.Scripts.Player
 		private const float MAX_FIRE_RATE = 0.5f;
 		private float fireRateTimer = 0;
 
-        private new void Update()
-        {
+		private new void Update()
+		{
 			base.Update();
 			//updating fireRateTimer
 			fireRateTimer += Time.deltaTime;
 
-			if (life.Health > 0)
+			if (life.Health > 0 && !GameManager.instance.IsPaused)
 			{
 				//keeping track of this every frame to help prevent accidental fires or mis-aiming
 				Vector3 aim = new Vector3(
@@ -38,16 +39,17 @@ namespace Assets.Scripts.Player
 					-ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.RightStickY, id),
 					0) * distanceToPlayer;
 
+				// Poll Button input
 				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,id)) parkour.Jump();
-				if (ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.B,id)) parkour.SlideOn();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.RightBumper, id)) parkour.SlideRight();
+				if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.LeftBumper, id)) parkour.SlideLeft();
                 if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
-                else parkour.SlideOff();
 
 				if(Vector3.Magnitude(aim) > ControllerManager.CUSTOM_DEADZONE && !clickFire)
-	            {
+				{
 					//if the joystick is pushed past the 50% mark in any direction, start aiming the bow
 					archery.UpdateFirePoint(aim);
-	                fire = true;
+					fire = true;
 					if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.RightStickClick, id)) {
 						drawnArrow = false;
 						archery.Fire();
@@ -73,13 +75,13 @@ namespace Assets.Scripts.Player
 					clickFire = false;
 				}
 			}
-            //if (invincibleFrames > 0) invincibleFrames--;
-        }
+			//if (invincibleFrames > 0) invincibleFrames--;
+		}
 
 		void FixedUpdate() 
 		{
 			//This has to happen every fixed update as of now, can't think of a better way to handle it --kartik
-			if(life.Health > 0) 
+			if(life.Health > 0 && !GameManager.instance.IsPaused) 
 			{
 				parkour.Locomote(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id));
 			}
@@ -92,5 +94,11 @@ namespace Assets.Scripts.Player
 		internal override bool IsHoldingJump() {
 			return ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
 		}
-    }
+
+		/// <inheritdoc/>
+		internal override bool IsHoldingDown()
+		{
+			return ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickY,ID) < -3 * ControllerManager.CUSTOM_DEADZONE;
+		}
+	}
 }

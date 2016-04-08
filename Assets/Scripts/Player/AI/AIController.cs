@@ -67,6 +67,7 @@ namespace Assets.Scripts.Player.AI
 		private new void Update()
 		{
 			base.Update();
+			if(GameManager.instance.IsPaused) return;
 			if (life.Health <= 0 || GameManager.instance.GameFinished)
 			{
 				aiming = false;
@@ -121,7 +122,7 @@ namespace Assets.Scripts.Player.AI
 		/// </summary>
 		private void FixedUpdate()
 		{
-			if (life.Health > 0)
+			if (life.Health > 0 && !GameManager.instance.IsPaused && !GameManager.instance.GameFinished)
 			{
 				parkour.Locomote(runSpeed);
 			}
@@ -153,6 +154,12 @@ namespace Assets.Scripts.Player.AI
 		/// <returns>Whether the controller is holding the jump button.</returns>
 		internal override bool IsHoldingJump() {
 			return jump;
+		}
+
+		/// <inheritdoc/>
+		internal override bool IsHoldingDown()
+		{
+			return false;
 		}
 
 		/// <summary>

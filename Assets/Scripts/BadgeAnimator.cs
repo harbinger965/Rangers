@@ -57,29 +57,6 @@ public class BadgeAnimator : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(startTimer > 4f) {
-//			if(transform.eulerAngles.y < 180)
-//				transform.Rotate(Vector3.up*Mathf.Abs((transform.eulerAngles.y+2f)*Time.deltaTime));
-//			else
-//				transform.Rotate(Vector3.up*Mathf.Abs(((360-transform.eulerAngles.y)+2f)*Time.deltaTime));
-//			
-//			if(transform.eulerAngles.y > 90f && transform.eulerAngles.y < 270f && !flipped) {
-//				Sprite temp = transform.GetChild(0).GetComponent<Image>().sprite;
-//				transform.GetChild(0).GetComponent<Image>().sprite = transform.GetChild(2).GetComponent<Image>().sprite;
-//				transform.GetChild(2).GetComponent<Image>().sprite = temp;
-//				
-//				transform.GetChild(0).localPosition = new Vector3(0,0,-0.2f);
-//				transform.GetChild(2).localPosition = new Vector3(0,0,0);
-//				flipped = true;
-//			} else if((transform.eulerAngles.y < 90f || transform.eulerAngles.y > 270f) && flipped) {
-//				Sprite temp = transform.GetChild(0).GetComponent<Image>().sprite;
-//				transform.GetChild(0).GetComponent<Image>().sprite = transform.GetChild(2).GetComponent<Image>().sprite;
-//				transform.GetChild(2).GetComponent<Image>().sprite = temp;
-//				
-//				transform.GetChild(0).localPosition = new Vector3(0,0,0);
-//				transform.GetChild(2).localPosition = new Vector3(0,0,-0.2f);
-//				flipped = false;
-//			}
-
 			if(mask && mask.sizeDelta.y < 2f && infoOpen) {
 				mask.sizeDelta = Vector2.MoveTowards(mask.sizeDelta, new Vector2(1.3f,2f),(mask.sizeDelta.y+0.1f)*Time.deltaTime*3f);
 			} else if (mask && mask.sizeDelta.y > 0f && !infoOpen) {
@@ -91,8 +68,18 @@ public class BadgeAnimator : MonoBehaviour {
 
 			if(id != PlayerID.None) {
 				if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) infoOpen = !infoOpen;
-				if(ControllerManager.instance.GetTrigger(ControllerInputWrapper.Triggers.RightTrigger, id) > 0) infoText.rectTransform.anchoredPosition += Vector2.up*Time.deltaTime;
-				if(ControllerManager.instance.GetTrigger(ControllerInputWrapper.Triggers.LeftTrigger, id) > 0) infoText.rectTransform.anchoredPosition -= Vector2.up*Time.deltaTime;
+				if(infoText.rectTransform.anchoredPosition.y < -1.5f) {
+					if(ControllerManager.instance.GetTrigger(ControllerInputWrapper.Triggers.RightTrigger, id) > 0) infoText.rectTransform.anchoredPosition += Vector2.up*Time.deltaTime;
+					down.gameObject.SetActive(true);
+				} else {
+					down.gameObject.SetActive(false);
+				}
+				if(infoText.rectTransform.anchoredPosition.y > -2.5f) {
+					if(ControllerManager.instance.GetTrigger(ControllerInputWrapper.Triggers.LeftTrigger, id) > 0) infoText.rectTransform.anchoredPosition -= Vector2.up*Time.deltaTime;
+					up.gameObject.SetActive(true);
+				} else {
+					up.gameObject.SetActive(false);
+				}
 			}
 		} else {
 			startTimer += Time.deltaTime;
