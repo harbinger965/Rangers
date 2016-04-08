@@ -18,7 +18,9 @@ public class MainMenuPlayerTabsController : MonoBehaviour {
 			infoBlocks[i] = transform.GetChild(i).GetComponent<MainMenuPlayerInfoBlock>();
 		}
 
-		infoBlocks[0].PlayerAdded();
+		for(int i = 0; i < ControllerManager.instance.NumPlayers; i++) {
+			infoBlocks[i].PlayerAdded();
+		}
 	}
 	
 	// Update is called once per frame
