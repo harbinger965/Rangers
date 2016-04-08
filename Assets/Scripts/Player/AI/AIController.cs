@@ -169,7 +169,7 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="positionOffset">The vector from the ranger to its target.</param>
 		/// <param name="hit">The raycast information for the shot.</param> 
 		internal bool HasClearShot(Vector3 positionOffset, out RaycastHit hit) {
-			Debug.DrawRay(transform.position + Vector3.up - Vector3.Normalize(positionOffset), positionOffset, Color.white);
+			//Debug.DrawRay(transform.position + Vector3.up - Vector3.Normalize(positionOffset), positionOffset, Color.white);
 			hit = new RaycastHit();
 			return Bitwise.IsBitOn(ArcheryComponent.ArrowTypes, (int)Enums.Arrows.Ghost) || !Physics.Raycast(transform.position + Vector3.up - Vector3.Normalize(positionOffset), positionOffset, out hit, Vector3.Magnitude(positionOffset) + 1, LAYERMASK);
 		}

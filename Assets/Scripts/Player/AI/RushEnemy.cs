@@ -251,6 +251,7 @@ namespace Assets.Scripts.Player.AI
 				}
 			}
 
+			/*
 			Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
 			if (currentNode != null)
 			{
@@ -262,6 +263,7 @@ namespace Assets.Scripts.Player.AI
 				}
 				Debug.DrawLine(c.transform.position, target.transform.position, Color.red);
 			}
+			*/
 
 			RaycastHit under;
 			Physics.Raycast(playerCenter, Vector3.down, out under, 30, AIController.LAYERMASK);
