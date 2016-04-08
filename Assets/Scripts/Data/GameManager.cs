@@ -54,6 +54,10 @@ namespace Assets.Scripts.Data
 
         private int numDead = 0;
 
+		private bool paused = false;
+		public float deltaTime = 0f;
+		private List<Vector3> pausedVelocities;
+
         // Sets up singleton instance. Will remain if one does not already exist in scene
         void Awake()
         {
@@ -76,6 +80,30 @@ namespace Assets.Scripts.Data
 			gameOverUI = GameObject.Find("GameOverUI");
 			gameOverUI.SetActive(false);
         }
+
+		void Update()
+		{
+			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start)) paused = !paused;
+			if(paused) {
+				if(matchTimer.On) {
+					for(int i = 0; i < controllers.Count; i++) {
+						pausedVelocities.Insert(i,controllers[i].GetComponent<Rigidbody>().velocity);
+						controllers[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
+					}
+					deltaTime = 0;
+					matchTimer.On = false;
+				}
+			} else {
+				if(!matchTimer.On) {
+					for(int i = 0; i < controllers.Count; i++) {
+						controllers[i].GetComponent<Rigidbody>().velocity = pausedVelocities[i];
+						pausedVelocities.RemoveAt(i);
+					}
+					deltaTime = Time.deltaTime;
+					matchTimer.On = true;
+				}
+			}
+		}
 
 		void OnLevelWasLoaded(int level)
 		{
@@ -412,6 +440,11 @@ namespace Assets.Scripts.Data
 		public PlayerID CurrentWinner
 		{
 			get {return currentWinner; }
+		}
+
+		public bool IsPaused
+		{
+			get { return paused; }
 		}
         #endregion
     }

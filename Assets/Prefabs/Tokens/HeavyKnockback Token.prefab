@@ -700,6 +700,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 12
   collected: 0
+  image: {fileID: 21300000, guid: 5e37bfd1af67442d09092b90a1da2411, type: 3}
 --- !u!114 &11453970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -827,6 +828,11 @@ Prefab:
       propertyPath: m_IsKinematic
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: image
+      value: 
+      objectReference: {fileID: 21300000, guid: 5e37bfd1af67442d09092b90a1da2411,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 148824}

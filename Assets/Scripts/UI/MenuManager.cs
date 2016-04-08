@@ -45,10 +45,8 @@ namespace Assets.Scripts.UI
         {
             if(instance == null)
             {
-//                DontDestroyOnLoad(gameObject);
                 instance = this;
                 UpdatePanels(SplashPanel);
-				//ControllerManager manager = new ControllerManager();
             }
             else if (instance != this)
             {
@@ -117,17 +115,9 @@ namespace Assets.Scripts.UI
 			ControllerManager.instance.AddPlayer(ControllerInputWrapper.Buttons.Start);
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.Start, PlayerID.One))
             {
-//                if (GameManager.instance.AllPlayers.Count == 0)
-//                {
-//                    state = Enums.UIStates.Signin;
-//                    //UpdatePanels();
-//                }
-//                else
-//                {
-					state = Enums.UIStates.Signin;
-					UpdatePanels(SignInPanel);
+				state = Enums.UIStates.Signin;
+				UpdatePanels(SignInPanel);
 				SFXManager.instance.PlayAffirm();
-//                }
             }
 			if(ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.B, PlayerID.One))
             {
