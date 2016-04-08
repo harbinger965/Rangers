@@ -45,8 +45,10 @@ namespace Assets.Scripts.Attacks
 					alreadyHit[controller.ID] = true;
 					controller.LifeComponent.ModifyHealth(-damage);
 					hitPlayer = controller.ID;
+
 	                // Apply an explosion force to the object hit
-	                col.transform.root.GetComponent<Rigidbody>().AddExplosionForce(10f, transform.position, 10, 0.1f, ForceMode.VelocityChange);
+					col.transform.root.GetComponent<Rigidbody>().AddExplosionForce(15f, transform.position, 10, 0.5f, ForceMode.VelocityChange);
+	                
 				}
             }
             else if (col.transform.tag.Equals("Target"))
