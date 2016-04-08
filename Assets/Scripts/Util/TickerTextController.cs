@@ -13,7 +13,14 @@ public class TickerTextController : MonoBehaviour
 		" nothing but Pepsi, which is notably one of his corporate sponsors. # |Entertainment| Music: Kelly Clarkson has returned" +
 		" from the dead, upsetting many long-time Kelly Clarkson fans. # |News| World News: Russia 2 has declared war on Earth 3," +
 		" effectively ending the 10-year cabbage embargo. Martians are very concerned about their cabbages, as we all know that" +
-		" cabbages are an important aspect of the Martian economy.";
+		" cabbages are an important aspect of the Martian economy." +
+		" # |News| Agriculture: There have been reports of protests outside of the Russia 2 embassy at Slushyville, the provisional" +
+		" world capital after the recent nuclear war, by newly sentient cabbages demanding the Russian2s to bring back the cabbage" +
+		" embargo. # |News| Kids These Days: Local child Jimmy Phlegembateater gives an update on the latest trends kids have been" +
+		" adopting, including taking selfies with their dogs, wearing clown noses to school, and showering in squirrel blood as part" +
+		" of a widely popular ritual on Instagram to summon Cthulhu, our savior and destroyer who is currently slumbering in his house" +
+		" at R'lyeh and waiting, dreaming...      ph'nglui     mglw'nafh     Cthulhu     R'lyeh     wgah'nagl      fhtagn";
+
 
 	private static string[] separatedNews;
 	private Text tickerText1, tickerText2;

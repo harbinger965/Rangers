@@ -9,9 +9,11 @@ namespace Assets.Scripts.Levels
 { 
         public Transform portal;
 
-        void OnCollisionEnter(Collision other)
+        void OnTriggerEnter(Collider other)
         {
-            other.collider.transform.position = portal.position;
+			if(!other.transform.root.gameObject.name.Equals("Level")) {
+				other.transform.root.position = portal.position + transform.forward*2f + Vector3.up;
+			}
         }
     }
 }
