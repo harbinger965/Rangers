@@ -4141,7 +4141,7 @@ Transform:
   - {fileID: 1679751270}
   - {fileID: 981035688}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
 --- !u!1 &1042626620
 GameObject:
   m_ObjectHideFlags: 0
@@ -4753,7 +4753,7 @@ MonoBehaviour:
   - {fileID: 151848, guid: 356e65fdd857e374fb90db1273840efd, type: 2}
   - {fileID: 151848, guid: e1218eb2df1d573418a57c543744cf57, type: 2}
   - {fileID: 148824, guid: 81085c2bcd6ed9d46a8d4b432ed5e94f, type: 2}
-  - {fileID: 148824, guid: 6d94054004ac25645b13106d5cf3e8bc, type: 2}
+  - {fileID: 151848, guid: 9b504cb055803cf4e8c795cec7e3466a, type: 2}
   playerPrefab: {fileID: 186412, guid: badf013dea59345dea4f7bf40c82acba, type: 2}
   aiPlayerPrefab: {fileID: 105426, guid: af12fc772ec84464884347262c0edf19, type: 2}
   deltaTime: 0
@@ -6034,6 +6034,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 2119553301}
   - 114: {fileID: 2119553300}
+  - 114: {fileID: 2119553302}
   m_Layer: 0
   m_Name: TokenSpawner
   m_TagString: Untagged
@@ -6065,6 +6066,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+--- !u!114 &2119553302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2119553299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20dc2f380a76a4eb094239cc88b01757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  types: 0100000004000000050000000600000008000000090000000a0000000b0000000c0000000f000000
+  images:
+  - {fileID: 21300000, guid: af786c8ad6c571b429fc108327da361d, type: 3}
+  - {fileID: 21300000, guid: 1b773160c23ca7f4fb0239da198611f7, type: 3}
+  - {fileID: 21300000, guid: 5cf1a598aaed3f645a4055b84907ba5b, type: 3}
+  - {fileID: 21300000, guid: 9b002cc33ae154df4b1d74924eb0a5bf, type: 3}
+  - {fileID: 21300000, guid: fd673aeb2b67b944e9550ba62b4f6b10, type: 3}
+  - {fileID: 21300000, guid: e8736930c270d824798c1512cab9898b, type: 3}
+  - {fileID: 21300000, guid: b6d54a104d3c944cab4c7fd17af5efda, type: 3}
+  - {fileID: 21300000, guid: 8c6b57b241b8046f69efed6b5abd802f, type: 3}
+  - {fileID: 21300000, guid: 5e37bfd1af67442d09092b90a1da2411, type: 3}
+  - {fileID: 21300000, guid: 40db799095c0a4b7eafbec59df0082c8, type: 3}
 --- !u!1 &2126792469
 GameObject:
   m_ObjectHideFlags: 0

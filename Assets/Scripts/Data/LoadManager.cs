@@ -131,6 +131,7 @@ namespace Assets.Scripts.Data
             // Get a default settings in case none exists
             GameSettings data = new GameSettings();
             // If a file exists
+            Debug.Log(settingsDataPath + extension);
             if (File.Exists(settingsDataPath + extension))
             {
                 // Open the file and get all the data from the file to load

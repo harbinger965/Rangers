@@ -82,9 +82,9 @@ public class MapSelector : MonoBehaviour {
 		for (int i = name.Length - 1; i > 0; i--)
 		{
 			int letter = (int)name[i];
-			if (letter >= 65 && letter <= 90)
+			if (letter >= 48 && letter <= 57 || letter >= 65 && letter <= 90)
 			{
-				// Capital letters.
+				// Capital letters or numbers.
 				name = name.Insert(i, " ");
 			}
 		}
