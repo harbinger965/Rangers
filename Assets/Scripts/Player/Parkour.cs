@@ -69,15 +69,10 @@ namespace Assets.Scripts.Player
 					} 
 					else 
 					{
-						if(fallingTime < FALL_THRESHOLD) 
-						{
-							animator.SetFloat("RunSpeed", motion);
-							rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*8);
-						} 
-						else 
-						{
-							animator.SetFloat("RunSpeed", motion);
-							rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*6);
+						animator.SetFloat("RunSpeed", motion);
+						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*6);
+						if (controller.IsHoldingDown()) {
+							rigidbody.AddForce(0,-1,0,ForceMode.VelocityChange);
 						}
 					}
 				}
