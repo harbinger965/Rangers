@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using System.Collections.Generic;
+using Assets.Scripts.Tokens;
 
 namespace Assets.Scripts.Player.AI
 {
@@ -19,15 +21,26 @@ namespace Assets.Scripts.Player.AI
 		private float lastSpeed;
 
 		/// <summary> Timer for allowing the AI to turn. </summary>
-		private int turnTimer;
+		private float turnTimer;
 		/// <summary> Tick cooldown for the AI turning. </summary>
-		private const int TURNCOOLDOWN = 3;
+		private const float TURNCOOLDOWN = 1;
 
 		/// <summary> The distance away from a ledge that the AI will tolerate. </summary>
 		private const float LEDGEGRABDISTANCE = 0.6f;
 
+		/// <summary> Timer for the AI to replan its ledge path. </summary>
+		private float replanTimer;
+		/// <summary> The time interval used for the AI to replan its ledge path. </summary>
+		private const float REPLANTIME = 2;
+		/// <summary> The current ledge path that the AI is taking. </summary>
+		private LinkedList<LedgeNode> currentPath;
+		/// <summary> The ledge node that the AI is currently headed for. </summary>
+		private LedgeNode currentNode;
+
 		/// <summary> The ledges in the scene. </summary>
-		private static GameObject[] ledges;
+		private static LedgeNode[] ledges;
+		/// <summary> Stores the next node between two nodes. </summary>
+		private static LedgeNode[,] next;
 		/// <summary> The name of the level that ledges are currently cached for. </summary>
 		private static string levelName;
 
@@ -40,11 +53,73 @@ namespace Assets.Scripts.Player.AI
 			string sceneName = SceneManager.GetActiveScene().name;
 			if (ledges == null || levelName != sceneName)
 			{
-				// Load the level's edges if not already cached.
-				ledges = GameObject.FindGameObjectsWithTag("Ledge");
+				// Create the level edge network with Floyd-Warshall.
+				ledges = GameObject.FindObjectsOfType<LedgeNode>();
+				next = new LedgeNode[ledges.Length, ledges.Length];
+				float[,] distance = new float[ledges.Length, ledges.Length];
+				for (int i = 0; i < ledges.Length; i++)
+				{
+					ledges[i].index = i;
+				}
+				for (int i = 0; i < ledges.Length; i++)
+				{
+					for (int j = 0; j < ledges.Length; j++)
+					{
+						distance[i, j] = Mathf.Infinity;
+					}
+				}
+				for (int i = 0; i < ledges.Length; i++)
+				{
+					foreach (LedgeNode otherLedge in ledges[i].adjacentEdges)
+					{
+						distance[i, otherLedge.index] = Vector3.Distance(ledges[i].transform.position, otherLedge.transform.position);
+						next[i, otherLedge.index] = otherLedge;
+					}
+				}
+				for (int k = 0; k < ledges.Length; k++)
+				{
+					for (int i = 0; i < ledges.Length; i++)
+					{
+						for (int j = 0; j < ledges.Length; j++)
+						{
+							if (distance[i, k] + distance[k, j] < distance[i, j])
+							{
+								distance[i, j] = distance[i, k] + distance[k, j];
+								next[i, j] = next[i, k];
+							}
+						}
+					}
+				}
 				levelName = sceneName;
 			}
 		}
+
+		/// <summary>
+		/// Constructs a path from a start and end node.
+		/// </summary>
+		/// <returns>A path from the start to the end node.</returns>
+		/// <param name="start">The node to start from.</param>
+		/// <param name="end">The node to end at.</param>
+		private LinkedList<LedgeNode> GetPath(LedgeNode start, LedgeNode end)
+		{
+			LinkedList<LedgeNode> path = new LinkedList<LedgeNode>();
+			if (start == null || end == null || next[start.index, end.index] == null)
+			{
+				return path;
+			}
+			else
+			{
+				LedgeNode current = start;
+				path.AddLast(start);
+				while (current != end)
+				{
+					current = next[current.index, end.index];
+					path.AddLast(current);
+				}
+				return path;
+			}
+		}
+
 
 		/// <summary>
 		/// Picks an action for the character to do every tick.
@@ -53,6 +128,13 @@ namespace Assets.Scripts.Player.AI
 		public void ChooseAction(AIController controller)
 		{
 			if (target == null) {
+				controller.SetRunInDirection(0);
+				return;
+			}
+			Controller targetController = target.GetComponent<Controller>();
+			if (targetController != null && targetController.LifeComponent.Health <= 0)
+			{
+				controller.SetRunInDirection(0);
 				return;
 			}
 
@@ -62,134 +144,142 @@ namespace Assets.Scripts.Player.AI
 			float currentTargetDistance = targetDistance;
 			Vector3 opponentOffset = target.transform.position - controller.transform.position;
 			Vector3 targetOffset = opponentOffset;
-			float distanceTolerance = 1f;
-
+			float distanceTolerance = targetDistance - 1;
+			Vector3 playerCenter = controller.transform.position + Vector3.up * 0.75f;
 
 			// Check if there is a platform in the way of shooting.
 			RaycastHit hit;
-			controller.HasClearShot(opponentOffset, out hit);
-
-			Transform blockingLedge = null;
-			if (hit.collider != null)
+			// Find a ledge path to get to the target.
+			replanTimer -= Time.deltaTime;
+			if (replanTimer <= 0)
 			{
-				// If an obstacle is in the way, move around it.
-				float closestDistance = Mathf.Infinity;
-				// Find ledges on the obstructing platform.
-				BoxCollider[] children = hit.collider.GetComponentsInChildren<BoxCollider>();
-				bool foundBetween = false;
-				foreach (BoxCollider child in children)
+				replanTimer = REPLANTIME;
+				currentPath = GetPath(GetClosestLedgeNode(controller.transform), GetClosestLedgeNode(target.transform));
+				if (currentPath.Count > 0)
 				{
-					if (child.tag == "Ledge")
+					LoadNextLedge();
+				}
+			}
+
+			if (currentNode != null)
+			{
+				// Move towards the nearest ledge, jumping if needed.
+				Vector3 currentOffset = currentNode.transform.position - controller.transform.position;
+				Vector3 nextPosition = currentPath.Count > 0 ? currentPath.First.Value.transform.position : target.transform.position;
+				Vector3 nextOffset = nextPosition - currentNode.transform.position;
+
+				// Go to the next ledge node if possible.
+				if (nextOffset.y >= 0 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE && currentOffset.y <= 0  ||
+					nextOffset.y < 0 && currentOffset.y >= 0)
+				{
+					LoadNextLedge();
+				}
+				else
+				{
+					// Smooth the path if possible.
+					if (nextPosition == target.transform.position || GetPlatformUnderneath(controller.transform) == GetPlatformUnderneath(target.transform))
 					{
-						Vector3 ledgeOffset = child.transform.position - controller.transform.position;
-						if (Mathf.Sign(ledgeOffset.y) == Mathf.Sign(targetOffset.y)) {
-							// Look for the closest ledge to grab or fall from.
-							float currentDistance = Mathf.Abs(child.transform.position.x - controller.transform.position.x);
-							bool between = BetweenX(child.transform, controller.transform, target.transform);
-							if (!(foundBetween && !between) && currentDistance < closestDistance || !foundBetween && between)
+						if (controller.HasClearShot(opponentOffset, out hit))
+						{
+							currentNode = null;
+							replanTimer = 0;
+						}
+					}
+					else if (nextOffset.y >= 0 && currentOffset.y <= 0 ||
+						     nextOffset.y < 0)
+					{
+						RaycastHit nextPlatform;
+						Vector3 nextOffsetSelf = nextPosition - playerCenter;
+						if (Physics.Raycast(playerCenter, nextOffsetSelf, out nextPlatform, Vector3.Magnitude(nextOffsetSelf), AIController.LAYERMASK))
+						{
+							LedgeNode[] currentLedges = GetPlatformLedges(nextPlatform);
+							bool skip = false;
+							foreach (LedgeNode ledge in currentLedges)
 							{
-								foundBetween = foundBetween || between;
-								// Make sure the edge isn't off the side of the map.
-								float edgeMultiplier = 3;
-								if (Physics.Raycast(child.transform.position + Vector3.down * 0.5f + Vector3.left * edgeMultiplier, Vector3.down, 30, AIController.LAYERMASK) ||
-									Physics.Raycast(child.transform.position + Vector3.down * 0.5f + Vector3.right * edgeMultiplier, Vector3.down, 30, AIController.LAYERMASK))
+								if (ledge == currentNode && currentOffset.y > 0)
 								{
-									// Don't target ledges that have already been jumped over.
-									if (currentDistance > LEDGEGRABDISTANCE || child.transform.position.y >= controller.transform.position.y)
-									{
-										blockingLedge = child.transform;
-										closestDistance = currentDistance;
-									}
+									skip = false;
+									break;
 								}
+								else if (ledge == currentPath.First.Value)
+								{
+									skip = true;
+								}
+							}
+							if (skip)
+							{
+								LoadNextLedge();
 							}
 						}
 					}
 				}
-			}
-
-			Transform gapLedge = null;
-			RaycastHit under;
-			Physics.Raycast(controller.transform.position + Vector3.up * 0.5f, Vector3.down, out under, 30, AIController.LAYERMASK);
-			if (hit.collider == null)
-			{
-				// If the ranger and its target are not on the same platform, go to a nearby ledge.
-				RaycastHit underTarget;
-				Physics.Raycast(target.transform.position + Vector3.up * 0.5f, Vector3.down, out underTarget, 30, AIController.LAYERMASK);
-				if (under.collider != null && underTarget.collider != null && under.collider.gameObject != underTarget.collider.gameObject)
+				if (currentNode != null)
 				{
-					float closestLedgeDistance = Mathf.Infinity;
-					foreach (GameObject ledge in ledges)
+					currentOffset = currentNode.transform.position - controller.transform.position;
+					nextPosition = currentPath.Count > 0 ? currentPath.First.Value.transform.position : target.transform.position;
+					nextOffset = nextPosition - currentNode.transform.position;
+
+					currentTargetDistance = 0;
+					distanceTolerance = 0.1f;
+
+					if (Mathf.Abs(currentOffset.y) < distanceTolerance)
 					{
-						float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
-						if (currentDistance < closestLedgeDistance && ledge.transform.position.y > controller.transform.position.y + 1 &&
-							BetweenX(ledge.transform, controller.transform, target.transform))
+						currentOffset.y = 0;
+					}
+					if (Mathf.Abs(nextOffset.y) < distanceTolerance)
+					{
+						nextOffset.y = 0;
+					}
+
+					Vector3 platformOffset = currentNode.transform.position - GetLedgePlatform(currentNode).transform.position;
+
+					if (currentOffset.y > -2)
+					{
+						if (platformOffset.x > 0)
 						{
-							gapLedge = ledge.transform;
-							closestLedgeDistance = currentDistance;
+							currentOffset.x += LEDGEGRABDISTANCE;
+						}
+						else
+						{
+							currentOffset.x -= LEDGEGRABDISTANCE;
 						}
 					}
+
+					controller.jump = currentOffset.y > -0.75 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE / 2;
+
+					targetOffset = currentOffset;
 				}
 			}
 
-			Transform closestLedge;
-			if (blockingLedge == null)
+			/*
+			Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
+			if (currentNode != null)
 			{
-				closestLedge = gapLedge;
-			}
-			else if (gapLedge == null)
-			{
-				closestLedge = blockingLedge;
-			}
-			else
-			{
-				if (Vector3.Distance(blockingLedge.position, controller.transform.position) <= Vector3.Distance(gapLedge.position, controller.transform.position))
+				LedgeNode c = currentNode;
+				foreach (LedgeNode l in currentPath)
 				{
-					closestLedge = blockingLedge;
+					Debug.DrawLine(c.transform.position, l.transform.position, Color.red);
+					c = l;
 				}
-				else
-				{
-					closestLedge = gapLedge;
-				}
+				Debug.DrawLine(c.transform.position, target.transform.position, Color.red);
 			}
+			*/
 
-			if (closestLedge != null)
-			{
-				// Move towards the nearest ledge, jumping if needed.
-				Vector3 closestVector = closestLedge.position - controller.transform.position;
-				if (closestLedge.position.x - closestLedge.parent.position.x > 0)
-				{
-					closestVector.x += LEDGEGRABDISTANCE;
-				}
-				else
-				{
-					closestVector.x -= LEDGEGRABDISTANCE;
-				}
-				if (Math.Abs(closestVector.x) < 1f)
-				{
-					controller.jump = opponentOffset.y > 0 || gapLedge != null;
-				}
-				else
-				{
-					controller.jump = false;
-				}
-				currentTargetDistance = 0;
-				distanceTolerance = 0.1f;
-				targetOffset = closestVector;
-			}
-			Debug.DrawRay(controller.transform.position, targetOffset);
+			RaycastHit under;
+			Physics.Raycast(playerCenter, Vector3.down, out under, 30, AIController.LAYERMASK);
+			LedgeNode closestLedge = null;
 
 			// Check if the AI is falling to its death.
 			if (under.collider == null)
 			{
 				// Find the closest ledge to go to.
-				closestLedge = null;
 				float closestLedgeDistance = Mathf.Infinity;
-				foreach (GameObject ledge in ledges)
+				foreach (LedgeNode ledge in ledges)
 				{
 					float currentDistance = Mathf.Abs(ledge.transform.position.x - controller.transform.position.x);
 					if (currentDistance < closestLedgeDistance && ledge.transform.position.y < controller.transform.position.y + 1)
 					{
-						closestLedge = ledge.transform;
+						closestLedge = ledge;
 						closestLedgeDistance = currentDistance;
 					}
 				}
@@ -199,7 +289,7 @@ namespace Assets.Scripts.Player.AI
 					controller.SetRunInDirection(-controller.transform.position.x);
 				}
 				else {
-					float ledgeOffsetX = closestLedge.position.x - controller.transform.position.x;
+					float ledgeOffsetX = closestLedge.transform.position.x - controller.transform.position.x;
 					if (Mathf.Abs(ledgeOffsetX) > LEDGEGRABDISTANCE)
 					{
 						controller.SetRunInDirection(ledgeOffsetX);
@@ -213,12 +303,6 @@ namespace Assets.Scripts.Player.AI
 				}
 			}
 
-			if (currentTargetDistance > 0 && targetOffset.y < -1 && (closestLedge != null || Mathf.Abs(opponentOffset.x) > 1))
-			{
-				// Move onto a platform if a ledge was just negotiated.
-				currentTargetDistance = 0;
-			}
-
 			// Move towards the opponent.
 			float horizontalDistance = Mathf.Abs(targetOffset.x);
 			if (horizontalDistance > currentTargetDistance)
@@ -229,6 +313,10 @@ namespace Assets.Scripts.Player.AI
 			{
 				controller.SetRunInDirection(-targetOffset.x);
 			}
+			else if (opponentOffset == targetOffset && under.collider != null && (controller.ParkourComponent.FacingRight ^ opponentOffset.x > 0))
+			{
+				controller.ParkourComponent.FacingRight = opponentOffset.x > 0;
+			}
 			else
 			{
 				controller.runSpeed = 0;
@@ -237,10 +325,10 @@ namespace Assets.Scripts.Player.AI
 			{
 				// Don't chase an opponent off the map.
 				Vector3 offsetPosition = controller.transform.position;
-				offsetPosition.x += controller.runSpeed;
+				offsetPosition.x += controller.runSpeed / 2;
 				offsetPosition.y += 0.5f;
 				Vector3 offsetPosition3 = offsetPosition;
-				offsetPosition3.x += controller.runSpeed * 2;
+				offsetPosition3.x += controller.runSpeed;
 				if (!Physics.Raycast(offsetPosition, Vector3.down, out hit, 30, AIController.LAYERMASK) &&
 					!Physics.Raycast(offsetPosition3, Vector3.down, out hit, 30, AIController.LAYERMASK))
 				{
@@ -257,7 +345,8 @@ namespace Assets.Scripts.Player.AI
 				else
 				{
 					// Slide if the opponent is far enough away for sliding to be useful.
-					controller.slide = horizontalDistance > targetDistance * 2;
+					controller.ParkourComponent.FacingRight = opponentOffset.x > 0;
+					controller.slide = horizontalDistance > this.targetDistance * 2 && currentNode == null;
 				}
 			}
 
@@ -270,7 +359,8 @@ namespace Assets.Scripts.Player.AI
 			if (controller.runSpeed > 0 && lastSpeed < 0 || controller.runSpeed < 0 && lastSpeed > 0)
 			{
 				// Check if the AI turned very recently to avoid thrashing.
-				if (turnTimer-- <= 0) {
+				turnTimer -= Time.deltaTime;
+				if (turnTimer <= 0) {
 					turnTimer = TURNCOOLDOWN;
 				} else {
 					controller.runSpeed = 0;
@@ -278,21 +368,117 @@ namespace Assets.Scripts.Player.AI
 			}
 
 			// Jump to reach some tokens.
-			if (targetDistance == 0 && controller.runSpeed == 0) {
+			if (targetDistance == 0 && controller.runSpeed == 0 && target.GetComponent<ArrowToken>()) {
 				controller.jump = true;
 			}
 		}
 
 		/// <summary>
-		/// Checks whether an object is between two other objects in the x direction.
+		/// Gets the closest ledge node from a target.
 		/// </summary>
-		/// <returns>Whether the object is between two other objects in the x direction.</returns>
-		/// <param name="middle">The object to check for being between two others.</param>
-		/// <param name="limit1">One object to be between.</param>
-		/// <param name="limit2">The other object to be between.</param>
-		private bool BetweenX(Transform middle, Transform limit1, Transform limit2)
+		/// <returns>The closest node.</returns>
+		/// <param name="target">Target.</param>
+		private LedgeNode GetClosestLedgeNode(Transform target)
 		{
-			return Mathf.Sign(middle.position.x - limit1.position.x) != Mathf.Sign(middle.position.x - limit2.position.x);
+			RaycastHit hit;
+			LedgeNode[] currentLedges = ledges;
+			if (Physics.Raycast(target.position + Vector3.up * 0.5f, Vector3.down, out hit, 30, AIController.LAYERMASK))
+			{
+				currentLedges = GetPlatformLedges(hit);
+			}
+			LedgeNode closestLedge = null;
+			float closestDistance = Mathf.Infinity;
+			foreach (LedgeNode ledge in currentLedges)
+			{
+				float currentDistance = Vector3.Distance(target.position, ledge.transform.position);
+				if (ledge.transform.position.y < target.position.y + 1.5f &&
+					currentDistance < closestDistance)
+				{
+					closestLedge = ledge;
+					closestDistance = currentDistance;
+				}
+			}
+			return closestLedge;
+		}
+
+		/// <summary>
+		/// Loads the next ledge node into the current node.
+		/// </summary>
+		private void LoadNextLedge()
+		{
+			if (currentPath == null || currentPath.Count == 0)
+			{
+				currentNode = null;
+				replanTimer = 0;
+			}
+			else
+			{
+				currentNode = currentPath.First.Value;
+				currentPath.RemoveFirst();
+			}
+		}
+
+		/// <summary>
+		/// Gets the platform that a ledge is a part of.
+		/// </summary>
+		/// <returns>The platform that a ledge is a part of.</returns>
+		/// <param name="ledge">The ledge to get a platform for.</param>
+		private GameObject GetLedgePlatform(LedgeNode ledge)
+		{
+			if (ledge.transform.parent.parent != null)
+			{
+				return ledge.transform.parent.parent.gameObject;
+			}
+			else
+			{
+				return ledge.transform.parent.gameObject;
+			}
+		}
+
+		/// <summary>
+		/// Gets the ledges attached to a platform.
+		/// </summary>
+		/// <returns>The ledges attached to the platform.</returns>
+		/// <param name="platformHit">The raycast that hit the platform.</param>
+		private LedgeNode[] GetPlatformLedges(RaycastHit platformHit)
+		{
+			LedgeNode[] currentLedges;
+			if (platformHit.collider.tag == "Ledge")
+			{
+				currentLedges = platformHit.collider.transform.parent.GetComponentsInChildren<LedgeNode>();
+			}
+			else
+			{
+				currentLedges = platformHit.collider.GetComponentsInChildren<LedgeNode>();
+			}
+			if (currentLedges.Length == 0 && platformHit.collider.transform.parent != null)
+			{
+				currentLedges = platformHit.collider.transform.parent.GetComponentsInChildren<LedgeNode>();
+			}
+			return currentLedges;
+		}
+
+		/// <summary>
+		/// Gets the platform underneath a position.
+		/// </summary>
+		/// <returns>The platform underneath the position.</returns>
+		/// <param name="target">The position to get a platform from.</param>
+		private GameObject GetPlatformUnderneath(Transform target)
+		{
+			RaycastHit hit;
+			if (Physics.Raycast(target.position + Vector3.up * 0.5f, Vector3.down, out hit, 30, AIController.LAYERMASK))
+			{
+				Transform current = hit.collider.transform;
+				while (current != null)
+				{
+					if (current.tag == "Ground")
+					{
+						return current.gameObject;
+					}
+					current = current.parent;
+				}
+			}
+			return null;
 		}
 	}
 }

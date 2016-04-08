@@ -16,7 +16,7 @@ namespace Assets.Scripts.Player.AI
 		/// <summary> The policy the AI is using to approach an enemy. </summary>
 		private RushEnemy rushPolicy = new RushEnemy(TARGETDISTANCE);
 		/// <summary> The policy the AI is using to shoot at an enemy. </summary>
-		private Shoot shootPolicy = new Shoot(0.25f, 0.4f, -Mathf.PI / 4);
+		private Shoot shootPolicy = new Shoot(0.5f, 0.4f, -Mathf.PI / 4);
 
 		/// <summary> The opponent that the AI is currently shooting at. </summary>
 		private Controller shootTarget;
@@ -54,18 +54,21 @@ namespace Assets.Scripts.Player.AI
 						}
 					}
 				}
-				foreach (GameObject token in TokenSpawner.instance.Tokens)
+				if (controller.ArcheryComponent.CanCollectToken())
 				{
-					// See if any tokens are close enough to bother with.
-					if (token.activeSelf)
+					foreach (GameObject token in TokenSpawner.instance.Tokens)
 					{
-						float tokenDistance = Vector3.Distance(token.transform.position, controller.transform.position);
-						if (tokenDistance < closestDistance)
+						// See if any tokens are close enough to bother with.
+						if (token.activeSelf)
 						{
-							closestDistance = tokenDistance;
-							targetToken = token;
-							rushPolicy.target = token.gameObject;
-							rushPolicy.targetDistance = 0;
+							float tokenDistance = Vector3.Distance(token.transform.position, controller.transform.position);
+							if (tokenDistance < closestDistance && !Util.Bitwise.IsBitOn(controller.ArcheryComponent.ArrowTypes, (int)token.GetComponent<ArrowToken>().Type))
+							{
+								closestDistance = tokenDistance;
+								targetToken = token;
+								rushPolicy.target = token.gameObject;
+								rushPolicy.targetDistance = 0;
+							}
 						}
 					}
 				}
@@ -75,6 +78,7 @@ namespace Assets.Scripts.Player.AI
 					rushPolicy.targetDistance = TARGETDISTANCE;
 				}
 				shootPolicy.target = closestOpponent;
+				shootTarget = closestOpponent;
 			}
 
 			rushPolicy.ChooseAction(controller);
@@ -89,8 +93,6 @@ namespace Assets.Scripts.Player.AI
 				targetToken = null;
 				if (shootPolicy.target != null) {
 					rushPolicy.target = shootPolicy.target.gameObject;
-				} else {
-					shootTarget = null;
 				}
 			}
 		}
