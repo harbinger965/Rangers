@@ -12,6 +12,7 @@ public class ProfileManager : MonoBehaviour {
 		if(instance == null) {
 			instance = this;
 			loadedProfiles = new Dictionary<PlayerID, ProfileData>();
+			DontDestroyOnLoad(this.gameObject);
 		} else if (instance != this) {
 			Destroy(this);
 		}
