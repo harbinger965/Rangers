@@ -339,7 +339,7 @@ namespace Assets.Scripts.Player.AI
 				else
 				{
 					// Slide if the opponent is far enough away for sliding to be useful.
-					controller.slide = horizontalDistance > targetDistance * 2;
+					controller.slide = horizontalDistance > this.targetDistance * 3;
 				}
 			}
 
@@ -440,6 +440,10 @@ namespace Assets.Scripts.Player.AI
 			if (currentLedges.Length == 0 && platformHit.collider.transform.parent != null)
 			{
 				currentLedges = platformHit.collider.transform.parent.GetComponentsInChildren<LedgeNode>();
+			}
+			if (currentLedges.Length == 0)
+			{
+				Debug.Log(platformHit);
 			}
 			return currentLedges;
 		}
