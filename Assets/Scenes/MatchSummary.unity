@@ -6182,7 +6182,6 @@ MonoBehaviour:
   badge3_1: {fileID: 21300000, guid: d8771e6ed07934b05a230ec66924cc71, type: 3}
   badge3_2: {fileID: 21300000, guid: 22ba239e652ba4b979e220b6ecfda411, type: 3}
   badge3_3: {fileID: 21300000, guid: d7dc55bf0899f40ec898302c42e1117f, type: 3}
-  id: 0
   mask: {fileID: 398418304}
   tagText: {fileID: 564759093}
   infoText: {fileID: 1333031604}
@@ -15927,7 +15926,6 @@ MonoBehaviour:
   badge3_1: {fileID: 21300000, guid: d8771e6ed07934b05a230ec66924cc71, type: 3}
   badge3_2: {fileID: 21300000, guid: 22ba239e652ba4b979e220b6ecfda411, type: 3}
   badge3_3: {fileID: 21300000, guid: d7dc55bf0899f40ec898302c42e1117f, type: 3}
-  id: 0
   mask: {fileID: 1807988179}
   tagText: {fileID: 2007791470}
   infoText: {fileID: 1358726112}
@@ -20307,7 +20305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.69303775}
+  m_Color: {r: 1, g: 1, b: 1, a: 1.2429755}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -21053,7 +21051,6 @@ MonoBehaviour:
   badge3_1: {fileID: 21300000, guid: d8771e6ed07934b05a230ec66924cc71, type: 3}
   badge3_2: {fileID: 21300000, guid: 22ba239e652ba4b979e220b6ecfda411, type: 3}
   badge3_3: {fileID: 21300000, guid: d7dc55bf0899f40ec898302c42e1117f, type: 3}
-  id: 0
   mask: {fileID: 879910264}
   tagText: {fileID: 1333367831}
   infoText: {fileID: 309475523}
@@ -27421,7 +27418,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   Priority: 128
@@ -35695,7 +35692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 1.6019, g: 0.8943787, b: 0.52932596, a: 0.22693554}
+  m_Color: {r: 2.4986303, g: 1.838579, b: 0.84845495, a: 0.022743406}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -43304,7 +43301,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 1.5122489, g: 1.7034899, b: 1.3699554, a: 0.065989174}
+  m_Color: {r: 0.53825855, g: 1.5460702, b: 2.2404795, a: 0.0041510765}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -48289,7 +48286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.7260128}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.9727655}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -53506,7 +53503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 1.9582614, g: 0.9254549, b: 1.3755502, a: 0.3427386}
+  m_Color: {r: 1.5032724, g: 0.6475675, b: 2.3875775, a: 0.34285578}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -53579,7 +53576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3ffe47eb19eb6492987d48e7e649a453, type: 2}
-  m_Color: {r: 2.2756746, g: 1.7886995, b: 2.3127837, a: 0.11180477}
+  m_Color: {r: 0.7803228, g: 2.2878637, b: 1.0810132, a: 0.1264071}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -55904,7 +55901,6 @@ MonoBehaviour:
   badge3_1: {fileID: 21300000, guid: d8771e6ed07934b05a230ec66924cc71, type: 3}
   badge3_2: {fileID: 21300000, guid: 22ba239e652ba4b979e220b6ecfda411, type: 3}
   badge3_3: {fileID: 21300000, guid: d7dc55bf0899f40ec898302c42e1117f, type: 3}
-  id: 0
   mask: {fileID: 601254292}
   tagText: {fileID: 556014590}
   infoText: {fileID: 400466671}
