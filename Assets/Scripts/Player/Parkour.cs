@@ -24,10 +24,18 @@ namespace Assets.Scripts.Player
         /// <summary> The rigidbody attached to the player. </summary>
         private new Rigidbody rigidbody;
 
+		private Collider hipL, hipR, kneeL, kneeR;
+		private float legColliderReEnabler;
+
         private void Start()
 		{
 			animator = GetComponent<Animator>();
 			rigidbody = GetComponent<Rigidbody>();
+
+			hipL = transform.FindChild("U").FindChild("joint_Char").FindChild("joint_Pelvis").FindChild("joint_HipMaster").FindChild("joint_HipLT").GetComponent<Collider>();
+			hipR = transform.FindChild("U").FindChild("joint_Char").FindChild("joint_Pelvis").FindChild("joint_HipMaster").FindChild("joint_HipRT").GetComponent<Collider>();
+			kneeL = transform.FindChild("U").FindChild("joint_Char").FindChild("joint_Pelvis").FindChild("joint_HipMaster").FindChild("joint_HipLT").FindChild("joint_KneeLT").GetComponent<Collider>();
+			kneeR = transform.FindChild("U").FindChild("joint_Char").FindChild("joint_Pelvis").FindChild("joint_HipMaster").FindChild("joint_HipRT").FindChild("joint_KneeRT").GetComponent<Collider>();
 		}
 
 		public void Locomote(float motion) 
@@ -60,12 +68,12 @@ namespace Assets.Scripts.Player
 					if(!jumping) 
 					{
 						animator.SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*8);
+						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*8);
 					} 
 					else 
 					{
 						animator.SetFloat("RunSpeed", motion);
-						transform.Translate(Vector3.forward*motion*Time.deltaTime*4);
+						rigidbody.MovePosition(transform.position + transform.forward*motion*Time.deltaTime*4);
 					}
 				}
 			}
@@ -99,6 +107,16 @@ namespace Assets.Scripts.Player
 
 		void Update() 
 		{
+			if(!kneeL.enabled) {
+				Debug.Log(legColliderReEnabler);
+				legColliderReEnabler -= Time.deltaTime;
+				if(legColliderReEnabler <= 0) {
+					kneeL.enabled = true;
+					kneeR.enabled = true;
+					hipL.enabled = true;
+					hipR.enabled = true;
+				}
+			}
 			jumpingTimeOffset -= Time.deltaTime;
 			//			if(animator.GetCurrentAnimatorStateInfo(0).IsName("Slide")) {
 			////				transform.Translate(Vector3.right*lastMotion*Time.deltaTime*16f, Space.World);
@@ -197,6 +215,14 @@ namespace Assets.Scripts.Player
 		// Called by animation event, it is time to jump, handles full vs short hop
 		public void JumpVelocity() 
 		{
+			if(IKThingy) {
+				kneeL.enabled = false;
+				kneeR.enabled = false;
+				hipL.enabled = false;
+				hipR.enabled = false;
+				legColliderReEnabler = 0.2f;
+			}
+
 			// If the jump button is still being held, full hop
 			if (controller.IsHoldingJump())
 				rigidbody.velocity = Vector3.up*8f;
