@@ -4390,7 +4390,27 @@ MonoBehaviour:
   PS4_START: {fileID: 0}
   KEY_START: {fileID: 0}
   JOYLEFT: {fileID: 0}
+  DPAD_LEFTRIGHT: {fileID: 0}
+  DPAD_LEFTRIGHTUPDOWN: {fileID: 0}
   KEY_UPDOWNLEFTRIGHT: {fileID: 0}
+  KEY_LEFTRIGHT: {fileID: 0}
+  L_JOY_CLICK: {fileID: 0}
+  KEY_L_JOY_CLICK: {fileID: 0}
+  R_JOY_CLICK: {fileID: 0}
+  KEY_R_JOY_CLICK: {fileID: 0}
+  XBOX_X: {fileID: 0}
+  PS4_X: {fileID: 0}
+  KEY_X: {fileID: 0}
+  XBOX_Y: {fileID: 0}
+  PS4_Y: {fileID: 0}
+  KEY_Y: {fileID: 0}
+  XBOX_BACK: {fileID: 0}
+  PS4_BACK: {fileID: 0}
+  KEY_BACK: {fileID: 0}
+  RB: {fileID: 0}
+  LB: {fileID: 0}
+  KEY_RB: {fileID: 0}
+  KEY_LB: {fileID: 0}
 --- !u!4 &410697196
 Transform:
   m_ObjectHideFlags: 0
@@ -6174,6 +6194,7 @@ GameObject:
   - 114: {fileID: 1123281899}
   - 114: {fileID: 1123281900}
   - 114: {fileID: 1123281901}
+  - 114: {fileID: 1123281902}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -6325,6 +6346,21 @@ MonoBehaviour:
   m_MinZ: 0.01
   m_SSAOShader: {fileID: 4800000, guid: 43ca18288c424f645aaa1e9e07f04c50, type: 3}
   m_RandomTexture: {fileID: 2800000, guid: a181ca8e3c62f3e4b8f183f6c586b032, type: 3}
+--- !u!114 &1123281902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1123281892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92d823863b34e4648afb042b39991109, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 0.3
+  speed: 1
+  magnitude: 0.07
+  test: 0
 --- !u!1 &1136083803
 GameObject:
   m_ObjectHideFlags: 0
@@ -6808,6 +6844,7 @@ MonoBehaviour:
   - {fileID: 148824, guid: 4079ebb4e81811f40b4b5045291e1d59, type: 2}
   - {fileID: 148824, guid: 620705417fe842d46bb079b8700f00ed, type: 2}
   playerPrefab: {fileID: 0}
+  aiPlayerPrefab: {fileID: 0}
 --- !u!4 &1356824451
 Transform:
   m_ObjectHideFlags: 0
@@ -7317,6 +7354,7 @@ MonoBehaviour:
   flashMin: 0
   flashMax: 0
   numFlash: 0
+  flashBrightness: 8
 --- !u!1 &1588798631
 GameObject:
   m_ObjectHideFlags: 0

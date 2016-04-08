@@ -21,7 +21,8 @@ namespace Assets.Scripts.Attacks
         private Controller controller;
 
         void Start()
-        {
+		{
+			controller = GetComponent<Controller>();
             // Get all AcidAttacks already on the player (this component should have at least been added)
             AcidAttack[] currentAttacks = gameObject.GetComponents<AcidAttack>();
             // If this component is not the only AcidAttack on the player
@@ -30,7 +31,17 @@ namespace Assets.Scripts.Attacks
                 for(int i  = 0; i < currentAttacks.Length; i++)
                 {
                     // Reset the timer if it is the original timer and not this timer
-                    if(currentAttacks[i] != this) currentAttacks[i].Timer.Reset();
+                    if(currentAttacks[i] != this)
+					{
+						if(currentAttacks[i].Timer != null)
+						{
+							currentAttacks[i].Timer.Reset();
+						}
+						else
+						{
+							InitializeTimer();
+						}
+					}
                 }
                 // Destroy this AcidAttack because it is not the original
                 Destroy(this);
@@ -39,13 +50,19 @@ namespace Assets.Scripts.Attacks
             else
             {
                 // Initialize the acid attack
-                controller = GetComponent<Controller>();
-                t = gameObject.AddComponent<RepetitionTimer>();
-                t.Initialize(damageInterval, "Acid Attack", numHits);
-                t.TimeOut += new RepetitionTimer.TimerEvent(DamagePlayer);
-                t.FinalTick += FinalHit;
+				InitializeTimer();
             }
         }
+
+		/// <summary>
+		/// Initializes the acid timer.
+		/// </summary>
+		private void InitializeTimer() {
+			t = gameObject.AddComponent<RepetitionTimer>();
+			t.Initialize(damageInterval, "Acid Attack", numHits);
+			t.TimeOut += new RepetitionTimer.TimerEvent(DamagePlayer);
+			t.FinalTick += FinalHit;
+		}
 
         // Target for the repeating timer
         private void DamagePlayer(RepetitionTimer t)

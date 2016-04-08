@@ -49,10 +49,6 @@ namespace Assets.Scripts.Player.AI
 		[Tooltip("The default movement speed of the ranger.")]
 		private float defaultMoveSpeed = 1;
 
-		/// <summary> The AI mode that this ranger will use. </summary>
-		[Tooltip("The AI mode that this ranger will use.")]
-		public Enums.AIModes mode;
-
 		/// <summary> Layer mask for raycasting platforms. </summary>
 		internal const int LAYERMASK = 1 | 1 << 13;
 
@@ -61,11 +57,7 @@ namespace Assets.Scripts.Player.AI
 		/// </summary>
 		private new void Start()
 		{
-			switch (mode)
-			{
-			case Enums.AIModes.ApproachShoot: policy = new ApproachShoot(); break;
-			case Enums.AIModes.RangerBot: policy = new RangerBot(); break;
-			}
+			policy = new ApproachShoot();
 			base.Start();
 		}
 

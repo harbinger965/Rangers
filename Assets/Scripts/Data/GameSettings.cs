@@ -26,7 +26,6 @@ public class GameSettings
     // What type of game is running
     private Enums.GameType type;
 	// What type of variant does this gametype have
-	private Enums.GameVariant variant;
     // Dictionary of enabled tokns and their frequencies that they spawn
     private Dictionary<Enums.Tokens, Enums.Frequency> enabledTokens;
     // The token effects that are initialized by default that can't be turned off
@@ -39,7 +38,6 @@ public class GameSettings
     public GameSettings()
     {
         type = Enums.GameType.Stock;
-		variant = Enums.GameVariant.None;
         timeLimit = Mathf.Infinity;
         killLimit = Mathf.Infinity;
         stockLimit = DEFAULT_STOCK;
@@ -195,15 +193,6 @@ public class GameSettings
         get { return type; }
 		set { type = value; }
     }
-
-	/// <summary>
-	/// The current game type
-	/// </summary>
-	public Enums.GameVariant Variant
-	{
-		get { return variant; }
-		set { variant = value; }
-	}
 
     /// <summary>
     /// The dictionary of active tokens and their spawn frequencies

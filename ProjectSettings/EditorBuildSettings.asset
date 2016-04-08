@@ -11,3 +11,7 @@ EditorBuildSettings:
     path: Assets/Scenes/ProStadiums/ProLeagueStandard.unity
   - enabled: 1
     path: Assets/Scenes/MatchSummary.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/ProLeagueVariant1.unity
+  - enabled: 1
+    path: Assets/Scenes/ProStadiums/ProLeagueVariant2.unity
