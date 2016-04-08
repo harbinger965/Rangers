@@ -31,7 +31,7 @@ namespace Assets.Scripts.Player.AI
 		/// <summary> Timer for the AI to replan its ledge path. </summary>
 		private float replanTimer;
 		/// <summary> The time interval used for the AI to replan its ledge path. </summary>
-		private const float REPLANTIME = 1;
+		private const float REPLANTIME = 2;
 		/// <summary> The current ledge path that the AI is taking. </summary>
 		private LinkedList<LedgeNode> currentPath;
 		/// <summary> The ledge node that the AI is currently headed for. </summary>
@@ -196,7 +196,7 @@ namespace Assets.Scripts.Player.AI
 							bool skip = false;
 							foreach (LedgeNode ledge in currentLedges)
 							{
-								if (ledge == currentNode)
+								if (ledge == currentNode && currentOffset.y > 0)
 								{
 									skip = false;
 									break;
@@ -339,7 +339,7 @@ namespace Assets.Scripts.Player.AI
 				else
 				{
 					// Slide if the opponent is far enough away for sliding to be useful.
-					controller.slide = horizontalDistance > this.targetDistance * 3;
+					controller.slide = horizontalDistance > this.targetDistance * 3 && currentNode == null;
 				}
 			}
 
@@ -443,7 +443,7 @@ namespace Assets.Scripts.Player.AI
 			}
 			if (currentLedges.Length == 0)
 			{
-				Debug.Log(platformHit);
+				Debug.Log(platformHit.collider);
 			}
 			return currentLedges;
 		}
