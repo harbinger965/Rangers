@@ -15,7 +15,7 @@ namespace Assets.Scripts.Player
 		private bool drawnArrow;
 
 		//did the joystick overshoot the deadzone, triggering a fire?
-		private bool definitelyFire;
+		private bool clickFire;
 
 		//used to help check for overshooting the joystick deadzone
 		//Vector3 prevAim = Vector3.zero;
@@ -43,11 +43,18 @@ namespace Assets.Scripts.Player
                 if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.X, id)) GrabToken();
                 else parkour.SlideOff();
 
-				if(Vector3.Magnitude(aim) > 1.2f)
+				if(Vector3.Magnitude(aim) > 0f && !clickFire)
 	            {
 					//if the joystick is pushed past the 50% mark in any direction, start aiming the bow
-					archery.UpdateFirePoint(Vector3.Normalize(aim));
+					archery.UpdateFirePoint(aim);
 	                fire = true;
+					if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.RightStickClick, id)) {
+						drawnArrow = false;
+						archery.Fire();
+						fire = false;
+						fireRateTimer = 0;
+						clickFire = true;
+					}
 					if(!drawnArrow) {
 						SFXManager.instance.PlayArrowPull();
 						drawnArrow = true;
@@ -63,6 +70,7 @@ namespace Assets.Scripts.Player
 				{
 					//if the joystick isn't pushed in any direction then align the upper body with the legs
 					archery.AimUpperBodyWithLegs();
+					clickFire = false;
 				}
 			}
             //if (invincibleFrames > 0) invincibleFrames--;

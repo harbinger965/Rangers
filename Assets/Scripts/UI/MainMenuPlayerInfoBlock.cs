@@ -112,8 +112,7 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 		SetTag("AI " + (int)playerID);
 		ProfileManager.instance.AddProfile(new ProfileData(tagText.text), playerID);
 		ProfileManager.instance.GetProfile(playerID).SetAI();
-		HidePressToJoinGraphic();
-		pressToOpen.SetActive(false);
+		HidePressToJoinGraphic(false);
 		playerNumIndicator.color = Color.white;
 		tagText.color = Color.red;
 		tagText.transform.parent.GetComponent<Image>().color = Color.black;
@@ -124,6 +123,8 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 	/// </summary>
 	public void PlayerRemoved() {
 		ProfileManager.instance.RemoveProfile(playerID);
+		menuOpen = false;
+		nameCreatorInstructions.SetActive(false);
 	}
 
 	/// <summary>
@@ -156,8 +157,8 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 		pressToJoin.SetActive(true);
 	}
 
-	public void HidePressToJoinGraphic() {
-		pressToOpen.SetActive(true);
+	public void HidePressToJoinGraphic(bool showOpen = true) {
+		pressToOpen.SetActive(showOpen);
 		pressToJoin.SetActive(false);
 	}
 
@@ -195,10 +196,18 @@ public class MainMenuPlayerInfoBlock : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Checks if a name is currently being chosen in the block.
+	/// Checks if options are being selected in the block.
 	/// </summary>
-	/// <returns>Whether a name is currently being chosen in the block.</returns>
-	public bool ChoosingName() {
-		return nameCreator.activeInHierarchy;
+	/// <returns>Whether options are being selected in the block.</returns>
+	public bool Occupied() {
+		return nameCreator.activeInHierarchy || menuOpen;
+	}
+
+	/// <summary>
+	/// Resets the position of the color menu.
+	/// </summary>
+	public void ResetMenu() {
+		transform.localPosition = startingPosition;
+		menuOpen = false;
 	}
 }

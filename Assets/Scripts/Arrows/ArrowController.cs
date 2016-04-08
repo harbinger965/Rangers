@@ -31,6 +31,9 @@ namespace Assets.Scripts.Arrows
         private float trackingTime = 0f;
         private Controller trackingTarget;
 
+		// To prevent self-shooting immediately after firing
+		private float avoidPlayerTimer;
+
         // Reference to arrowhead
         [SerializeField]
         private Transform arrowhead;
@@ -66,6 +69,12 @@ namespace Assets.Scripts.Arrows
 
         void Update()
         {
+			if(!collider.enabled) {
+				avoidPlayerTimer += Time.deltaTime;
+				if(avoidPlayerTimer > 0.1f) {
+					collider.enabled = true;
+				}
+			}
             // Rotate the arrow towards the closest enemy if it is tracking
             if (trackingTime > 0)
             {
@@ -154,6 +163,7 @@ namespace Assets.Scripts.Arrows
                 Destroy(collider);
 				Destroy(transform.FindChild("Model").GetComponent<TrailRenderer>());
 				GameObject g = new GameObject();
+				transform.position += transform.forward*0.2f;
 				transform.parent = g.transform;
 				g.transform.parent = col.transform;
 				Destroy(g, 1f);
