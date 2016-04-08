@@ -263,6 +263,19 @@ namespace Assets.Scripts.Player
 		public bool FacingRight 
 		{
 			get { return facingRight; }
+			set 
+			{
+				if (animator.GetFloat("RunSpeed") == 0)
+				{
+					facingRight = value;
+					float motion = 0.01f;
+					if (!value)
+					{
+						motion = -motion;
+					}
+					animator.SetFloat("RunSpeed", motion);
+				}
+			}
 		}
 
         public bool Grappling

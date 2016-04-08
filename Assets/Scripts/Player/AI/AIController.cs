@@ -50,7 +50,7 @@ namespace Assets.Scripts.Player.AI
 		private float defaultMoveSpeed = 1;
 
 		/// <summary> Layer mask for raycasting platforms. </summary>
-		internal const int LAYERMASK = 1 | 1 << 13;
+		internal const int LAYERMASK = 1 << 13 | 1 << 15;
 
 		/// <summary>
 		/// Initializes the AI policy to use.
@@ -169,7 +169,9 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="positionOffset">The vector from the ranger to its target.</param>
 		/// <param name="hit">The raycast information for the shot.</param> 
 		internal bool HasClearShot(Vector3 positionOffset, out RaycastHit hit) {
-			return Bitwise.IsBitOn(ArcheryComponent.ArrowTypes, (int)Enums.Arrows.Ghost) || !Physics.Raycast(transform.position + Vector3.up * 0.5f, positionOffset, out hit, Vector3.Magnitude(positionOffset), LAYERMASK);
+			Debug.DrawRay(transform.position + Vector3.up - Vector3.Normalize(positionOffset), positionOffset, Color.white);
+			hit = new RaycastHit();
+			return Bitwise.IsBitOn(ArcheryComponent.ArrowTypes, (int)Enums.Arrows.Ghost) || !Physics.Raycast(transform.position + Vector3.up - Vector3.Normalize(positionOffset), positionOffset, out hit, Vector3.Magnitude(positionOffset) + 1, LAYERMASK);
 		}
 	}
 }

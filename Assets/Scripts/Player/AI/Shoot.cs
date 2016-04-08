@@ -41,8 +41,9 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="controller">The controller for the character.</param>
 		public void ChooseAction(AIController controller)
 		{
+			fireCooldown += Time.deltaTime;
 			if (target == null || target.LifeComponent.Health <= 0) {
-				controller.aiming = true;
+				controller.aiming = false;
 				return;
 			}
 
@@ -95,20 +96,19 @@ namespace Assets.Scripts.Player.AI
 			RaycastHit hit;
 			if (!controller.HasClearShot(positionOffset, out hit))
 			{
-				controller.aiming = true;
+				controller.aiming = false;
 				return;
 			}
 
 			if (controller.aiming)
 			{
-				if (controller.ArcheryComponent.StrengthPercentage >= power)
+				if (controller.ArcheryComponent.StrengthPercentage >= power && Mathf.Abs(Vector3.Angle(controller.aim, Vector3.right) - controller.ArcheryComponent.GetAimAngle()) < 7)
 				{
 					controller.aiming = false;
 				}
 			}
 			else
 			{
-				fireCooldown += Time.deltaTime;
 				if (fireCooldown > cooldownTime)
 				{
 					controller.aiming = true;
