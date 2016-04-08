@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.UI
 {
@@ -69,6 +70,13 @@ namespace Assets.Scripts.UI
                 newText.transform.localScale = new Vector3(1, 1, 1);
                 Destroy(newText, destroyTime);
             }
+
+            if (ControllerManager.instance.GetButtonDown(ControllerInputWrapper.Buttons.A, PlayerID.One)) Navigator.CallSubmit();
+        }
+
+        public void GoToMain()
+        {
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         }
     } 
 }

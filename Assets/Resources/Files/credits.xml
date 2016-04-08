@@ -2,13 +2,13 @@
 <Credits>
   <Space></Space>
   
-  <Name><![CDATA[<size=25>Eric Cook</size>]]></Name>
+  <Name><![CDATA[<size=20>Eric Cook</size>]]></Name>
   <Contribution>Programming</Contribution>
   <Contribution>2D Art</Contribution>
   
   <Space></Space>
   
-  <Name><![CDATA[<size=25>Kartik Kini</size>]]></Name>
+  <Name><![CDATA[<size=20>Kartik Kini</size>]]></Name>
   <Contribution>Programming</Contribution>
   <Contribution>UI</Contribution>
   
@@ -16,6 +16,9 @@
   <Space></Space>
 
   <Name><![CDATA[<size=30>Rangers</size>]]></Name>
+  
+  <Space></Space>
+  
   <Name><![CDATA[<size=30>VGDev Spring 2016</size>]]></Name>
   
   <Space></Space>
