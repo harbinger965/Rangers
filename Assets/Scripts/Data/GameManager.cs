@@ -215,7 +215,7 @@ namespace Assets.Scripts.Data
         /// <summary>
         /// Handles what happens when the game is over
         /// </summary>
-        private void GameOver()
+		public void GameOver()
         {
             //Debug.Log("Match concluded");
             if (matchTimer != null) matchTimer.On = false;
@@ -453,6 +453,7 @@ namespace Assets.Scripts.Data
 		public bool IsPaused
 		{
 			get { return paused; }
+			set { paused = value; }
 		}
         #endregion
     }

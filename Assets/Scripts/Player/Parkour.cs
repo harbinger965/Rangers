@@ -82,6 +82,7 @@ namespace Assets.Scripts.Player
 
 		public void Jump()
 		{
+			rigidbody.useGravity = true;
             if(grappling)
             {
                 GetComponent<Grapple>().Ungrapple();

@@ -92,7 +92,7 @@ namespace Assets.Scripts.Player
 		/// </summary>
 		/// <returns>Whether the controller is holding the jump button.</returns>
 		internal override bool IsHoldingJump() {
-			return ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
+			return !GameManager.instance.IsPaused && ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
 		}
 
 		/// <inheritdoc/>
