@@ -328,7 +328,46 @@ public class AutoKeyUI : MonoBehaviour {
 			}
 			break;
 		case Type.Trigger:
-
+			switch(trigger) {
+			case ControllerInputWrapper.Triggers.RightTrigger:
+				switch(ControllerManager.instance.PlayerControlType(id)) {
+				case ControllerManager.ControlType.Keyboard:
+					if(uiImage) {
+						GetComponent<Image>().sprite = InputTester.instance.KEY_RT;
+					} else {
+						GetComponent<SpriteRenderer>().sprite = InputTester.instance.KEY_RT;
+					}
+					break;
+				case ControllerManager.ControlType.Xbox:
+				case ControllerManager.ControlType.PS4:
+					if(uiImage) {
+						GetComponent<Image>().sprite = InputTester.instance.RT;
+					} else {
+						GetComponent<SpriteRenderer>().sprite = InputTester.instance.RT;
+					}
+					break;
+				}
+				break;
+			case ControllerInputWrapper.Triggers.LeftTrigger:
+				switch(ControllerManager.instance.PlayerControlType(id)) {
+				case ControllerManager.ControlType.Keyboard:
+					if(uiImage) {
+						GetComponent<Image>().sprite = InputTester.instance.KEY_LT;
+					} else {
+						GetComponent<SpriteRenderer>().sprite = InputTester.instance.KEY_LT;
+					}
+					break;
+				case ControllerManager.ControlType.Xbox:
+				case ControllerManager.ControlType.PS4:
+					if(uiImage) {
+						GetComponent<Image>().sprite = InputTester.instance.LT;
+					} else {
+						GetComponent<SpriteRenderer>().sprite = InputTester.instance.LT;
+					}
+					break;
+				}
+				break;
+			}
 			break;
 		case Type.DPAD:
 			switch(ControllerManager.instance.PlayerControlType(id)) {

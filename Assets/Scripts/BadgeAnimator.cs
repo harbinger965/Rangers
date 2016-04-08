@@ -56,7 +56,7 @@ public class BadgeAnimator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(startTimer > 4f) {
+		if(startTimer > 2f) {
 			if(mask && mask.sizeDelta.y < 2f && infoOpen) {
 				mask.sizeDelta = Vector2.MoveTowards(mask.sizeDelta, new Vector2(1.3f,2f),(mask.sizeDelta.y+0.1f)*Time.deltaTime*3f);
 			} else if (mask && mask.sizeDelta.y > 0f && !infoOpen) {

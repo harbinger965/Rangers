@@ -88,7 +88,7 @@ namespace Assets.Scripts.Data
 				paused = !paused;
 				recentPause = true;
 			}
-			if(paused) {
+			if(!GameFinished && paused) {
 				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						pausedVelocities.Add(controllers[i].GetComponent<Rigidbody>().velocity);
@@ -99,7 +99,7 @@ namespace Assets.Scripts.Data
 					if(matchTimer) matchTimer.On = false;
 					recentPause = false;
 				}
-			} else {
+			} else if(!GameFinished) {
 				if(recentPause) {
 					for(int i = 0; i < controllers.Count; i++) {
 						controllers[i].GetComponent<Rigidbody>().velocity = pausedVelocities[i];
