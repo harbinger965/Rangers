@@ -262,6 +262,8 @@ namespace Assets.Scripts.Arrows
                     return gameObject.AddComponent<RapidFireArrow>();
                 case Enums.Arrows.Grappling:
                     return gameObject.AddComponent<GrapplingArrow>();
+                case Enums.Arrows.Teleporting:
+                    return gameObject.AddComponent<TeleportArrow>();
                 default:
                     return gameObject.AddComponent<NormalArrow>();
             }
