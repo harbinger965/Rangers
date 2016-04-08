@@ -31,7 +31,7 @@ namespace Assets.Scripts.Player
 			//updating fireRateTimer
 			fireRateTimer += Time.deltaTime;
 
-			if (life.Health > 0 && !GameManager.instance.IsPaused)
+			if (life.Health > 0 && !GameManager.instance.IsPaused && !GameManager.instance.GameFinished)
 			{
 				//keeping track of this every frame to help prevent accidental fires or mis-aiming
 				Vector3 aim = new Vector3(
@@ -81,7 +81,7 @@ namespace Assets.Scripts.Player
 		void FixedUpdate() 
 		{
 			//This has to happen every fixed update as of now, can't think of a better way to handle it --kartik
-			if(life.Health > 0 && !GameManager.instance.IsPaused) 
+			if(life.Health > 0 && !GameManager.instance.IsPaused && !GameManager.instance.GameFinished) 
 			{
 				parkour.Locomote(ControllerManager.instance.GetAxis(ControllerInputWrapper.Axis.LeftStickX, id));
 			}
@@ -92,7 +92,7 @@ namespace Assets.Scripts.Player
 		/// </summary>
 		/// <returns>Whether the controller is holding the jump button.</returns>
 		internal override bool IsHoldingJump() {
-			return !GameManager.instance.IsPaused && ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
+			return !GameManager.instance.IsPaused && !GameManager.instance.GameFinished && ControllerManager.instance.GetButton(ControllerInputWrapper.Buttons.A,ID);
 		}
 
 		/// <inheritdoc/>

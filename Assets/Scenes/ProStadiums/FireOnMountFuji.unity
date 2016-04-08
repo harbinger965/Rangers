@@ -6466,7 +6466,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 639879130}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.06756538, y: -20.279804, z: -111.53978}
+  m_LocalPosition: {x: 0, y: -22.06, z: -47.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -8672,7 +8672,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1123281892}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 7, z: -28}
+  m_LocalPosition: {x: 0, y: 7, z: -47.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2059120506}
@@ -9813,6 +9813,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 186412, guid: badf013dea59345dea4f7bf40c82acba, type: 2}
   aiPlayerPrefab: {fileID: 105426, guid: af12fc772ec84464884347262c0edf19, type: 2}
   deltaTime: 0
+  countInTimer: 5
 --- !u!4 &1356824451
 Transform:
   m_ObjectHideFlags: 0
@@ -10817,6 +10818,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1582120723}
   - 20: {fileID: 1582120722}
+  - 45: {fileID: 1582120724}
   m_Layer: 0
   m_Name: Water4Simple (3)ReflectionSceneCamera
   m_TagString: Untagged
@@ -10865,11 +10867,19 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1582120721}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.06756538, y: -20.279804, z: -111.53978}
+  m_LocalPosition: {x: 0, y: -22.06, z: -47.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 45
+--- !u!45 &1582120724
+Skybox:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1582120721}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 0}
 --- !u!1 &1582641582
 GameObject:
   m_ObjectHideFlags: 0
@@ -11359,6 +11369,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1654230017}
   - 20: {fileID: 1654230016}
+  - 45: {fileID: 1654230018}
   m_Layer: 0
   m_Name: Water4Simple (2)ReflectionSceneCamera
   m_TagString: Untagged
@@ -11407,11 +11418,19 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1654230015}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.06756538, y: -20.279804, z: -111.53978}
+  m_LocalPosition: {x: 0, y: -22.06, z: -47.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 43
+--- !u!45 &1654230018
+Skybox:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1654230015}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 0}
 --- !u!1 &1654357404
 GameObject:
   m_ObjectHideFlags: 0
