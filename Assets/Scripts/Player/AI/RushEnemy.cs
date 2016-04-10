@@ -16,6 +16,9 @@ namespace Assets.Scripts.Player.AI
 
 		/// <summary> The object that the AI is targeting. </summary>
 		internal GameObject target;
+		/// <summary> The object that the AI's path is headed towards. </summary>
+		private GameObject pathTarget;
+
 
 		/// <summary> The AI's speed on the previous tick.</summary>
 		private float lastSpeed;
@@ -43,6 +46,9 @@ namespace Assets.Scripts.Player.AI
 		private static LedgeNode[,] next;
 		/// <summary> The name of the level that ledges are currently cached for. </summary>
 		private static string levelName;
+
+		/// <summary> Whether to draw debug lines for the ledge network. </summary>
+		private const bool DEBUGLINES = false;
 
 		/// <summary>
 		/// Initializes a new AI.
@@ -113,8 +119,28 @@ namespace Assets.Scripts.Player.AI
 				path.AddLast(start);
 				while (current != end)
 				{
+					LedgeNode previous = current;
 					current = next[current.index, end.index];
-					path.AddLast(current);
+					float offset = current.transform.position.y - previous.transform.position.y;
+					if (Mathf.Abs(offset) > 0.2f)
+					{
+						if (offset > 0)
+						{
+							current.YOffset = offset;
+							if (previous == start && offset < 5)
+							{
+								path.RemoveFirst();
+							}
+						}
+						else if (offset < 0)
+						{
+							previous.YOffset = offset;
+						}
+					}
+					if (current != end || GetLedgePlatform(current) != GetLedgePlatform(previous))
+					{
+						path.AddLast(current);
+					}
 				}
 				return path;
 			}
@@ -127,6 +153,16 @@ namespace Assets.Scripts.Player.AI
 		/// <param name="controller">The controller for the character.</param>
 		public void ChooseAction(AIController controller)
 		{
+			if (DEBUGLINES)
+			{
+				foreach (LedgeNode ledge in ledges)
+				{
+					foreach (LedgeNode adjacent in ledge.adjacentEdges)
+					{
+						Debug.DrawLine(ledge.transform.position, adjacent.transform.position, Color.yellow);
+					}
+				}
+			}
 			if (target == null) {
 				controller.SetRunInDirection(0);
 				return;
@@ -147,17 +183,49 @@ namespace Assets.Scripts.Player.AI
 			float distanceTolerance = targetDistance - 1;
 			Vector3 playerCenter = controller.transform.position + Vector3.up * 0.75f;
 
+			RaycastHit under;
+			Physics.Raycast(playerCenter, Vector3.down, out under, 30, AIController.LAYERMASK);
+
 			// Check if there is a platform in the way of shooting.
 			RaycastHit hit;
 			// Find a ledge path to get to the target.
 			replanTimer -= Time.deltaTime;
-			if (replanTimer <= 0)
+			if (pathTarget != target && currentNode == null)
+			{
+				replanTimer = 0;
+			}
+			if (OnSamePlatform(controller.transform, target.transform))
+			{
+				if (Mathf.Abs(opponentOffset.y) < 5 && (Mathf.Abs(opponentOffset.y) < 0.1f || under.distance < 1))
+				{
+					currentNode = null;
+				}
+			}
+			else if (replanTimer <= 0)
 			{
 				replanTimer = REPLANTIME;
+				pathTarget = target;
 				currentPath = GetPath(GetClosestLedgeNode(controller.transform), GetClosestLedgeNode(target.transform));
 				if (currentPath.Count > 0)
 				{
+					currentPath.Last.Value.YOffset = target.transform.position.y - currentPath.Last.Value.transform.position.y;
 					LoadNextLedge();
+					currentNode.YOffset = currentNode.transform.position.y - controller.transform.position.y;
+					if (currentPath.Count > 0)
+					{
+						if (GetLedgePlatform(currentPath.First.Value) == GetPlatformUnderneath(controller.transform))
+						{
+							LoadNextLedge();
+						}
+						else if (currentPath.Count == 1 && Mathf.Abs(currentNode.transform.position.y - currentPath.First.Value.transform.position.y) < 0.2f)
+						{
+							currentNode = null;
+						}
+					}
+				}
+				else
+				{
+					currentNode = null;
 				}
 			}
 
@@ -165,59 +233,16 @@ namespace Assets.Scripts.Player.AI
 			{
 				// Move towards the nearest ledge, jumping if needed.
 				Vector3 currentOffset = currentNode.transform.position - controller.transform.position;
-				Vector3 nextPosition = currentPath.Count > 0 ? currentPath.First.Value.transform.position : target.transform.position;
-				Vector3 nextOffset = nextPosition - currentNode.transform.position;
 
 				// Go to the next ledge node if possible.
-				if (nextOffset.y >= 0 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE && currentOffset.y <= 0  ||
-					nextOffset.y < 0 && currentOffset.y >= 0)
+				if (currentNode.YOffset >= 0 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE / 3 && currentOffset.y <= 0  ||
+					currentNode.YOffset < 0 && currentOffset.y >= 1.5f)
 				{
 					LoadNextLedge();
-				}
-				else
-				{
-					// Smooth the path if possible.
-					if (nextPosition == target.transform.position || GetPlatformUnderneath(controller.transform) == GetPlatformUnderneath(target.transform))
-					{
-						if (controller.HasClearShot(opponentOffset, out hit))
-						{
-							currentNode = null;
-							replanTimer = 0;
-						}
-					}
-					else if (nextOffset.y >= 0 && currentOffset.y <= 0 ||
-						     nextOffset.y < 0)
-					{
-						RaycastHit nextPlatform;
-						Vector3 nextOffsetSelf = nextPosition - playerCenter;
-						if (Physics.Raycast(playerCenter, nextOffsetSelf, out nextPlatform, Vector3.Magnitude(nextOffsetSelf), AIController.LAYERMASK))
-						{
-							LedgeNode[] currentLedges = GetPlatformLedges(nextPlatform);
-							bool skip = false;
-							foreach (LedgeNode ledge in currentLedges)
-							{
-								if (ledge == currentNode && currentOffset.y > 0)
-								{
-									skip = false;
-									break;
-								}
-								else if (ledge == currentPath.First.Value)
-								{
-									skip = true;
-								}
-							}
-							if (skip)
-							{
-								LoadNextLedge();
-							}
-						}
-					}
 				}
 				if (currentNode != null)
 				{
 					currentOffset = currentNode.transform.position - controller.transform.position;
-					nextPosition = currentPath.Count > 0 ? currentPath.First.Value.transform.position : target.transform.position;
-					nextOffset = nextPosition - currentNode.transform.position;
 
 					currentTargetDistance = 0;
 					distanceTolerance = 0.1f;
@@ -226,47 +251,45 @@ namespace Assets.Scripts.Player.AI
 					{
 						currentOffset.y = 0;
 					}
-					if (Mathf.Abs(nextOffset.y) < distanceTolerance)
-					{
-						nextOffset.y = 0;
-					}
 
 					Vector3 platformOffset = currentNode.transform.position - GetLedgePlatform(currentNode).transform.position;
 
-					if (currentOffset.y > -2)
+					float ledgeOffset = -0.1f;
+					if (currentNode.YOffset > 0 && currentOffset.y > -0.5f ||
+						currentNode.YOffset < 0)
 					{
-						if (platformOffset.x > 0)
-						{
-							currentOffset.x += LEDGEGRABDISTANCE;
-						}
-						else
-						{
-							currentOffset.x -= LEDGEGRABDISTANCE;
-						}
+						ledgeOffset = LEDGEGRABDISTANCE;
+					}
+					if (platformOffset.x > 0)
+					{
+						currentOffset.x += ledgeOffset;
+					}
+					else
+					{
+						currentOffset.x -= ledgeOffset;
 					}
 
-					controller.jump = currentOffset.y > -0.75 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE / 2;
-
+					controller.jump = currentNode.YOffset >= 0 && Math.Abs(currentOffset.x) <= LEDGEGRABDISTANCE / 2;
+					 
 					targetOffset = currentOffset;
 				}
 			}
 
-			/*
-			Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
-			if (currentNode != null)
+			if (DEBUGLINES)
 			{
-				LedgeNode c = currentNode;
-				foreach (LedgeNode l in currentPath)
+				Debug.DrawRay(controller.transform.position, targetOffset, Color.red);
+				if (currentNode != null)
 				{
-					Debug.DrawLine(c.transform.position, l.transform.position, Color.red);
-					c = l;
+					LedgeNode c = currentNode;
+					foreach (LedgeNode l in currentPath)
+					{
+						Debug.DrawLine(c.transform.position, l.transform.position, Color.red);
+						c = l;
+					}
+					Debug.DrawLine(c.transform.position, target.transform.position, Color.red);
 				}
-				Debug.DrawLine(c.transform.position, target.transform.position, Color.red);
 			}
-			*/
-
-			RaycastHit under;
-			Physics.Raycast(playerCenter, Vector3.down, out under, 30, AIController.LAYERMASK);
+				
 			LedgeNode closestLedge = null;
 
 			// Check if the AI is falling to its death.
@@ -328,7 +351,7 @@ namespace Assets.Scripts.Player.AI
 			{
 				// Don't chase an opponent off the map.
 				Vector3 offsetPosition = controller.transform.position;
-				offsetPosition.x += controller.runSpeed / 2;
+				offsetPosition.x += controller.runSpeed / 3;
 				offsetPosition.y += 0.5f;
 				Vector3 offsetPosition3 = offsetPosition;
 				offsetPosition3.x += controller.runSpeed;
@@ -349,7 +372,7 @@ namespace Assets.Scripts.Player.AI
 				{
 					// Slide if the opponent is far enough away for sliding to be useful.
 					controller.ParkourComponent.FacingRight = opponentOffset.x > 0;
-					controller.slide = horizontalDistance > this.targetDistance * 2 && currentNode == null;
+					controller.slide = horizontalDistance > 10 && currentNode == null && OnSamePlatform(controller.transform, target.transform);
 				}
 			}
 
@@ -371,9 +394,11 @@ namespace Assets.Scripts.Player.AI
 			}
 
 			// Jump to reach some tokens.
-			if (targetDistance == 0 && controller.runSpeed == 0 && target.GetComponent<ArrowToken>()) {
+			if (targetDistance == 0 && controller.runSpeed == 0 && target.GetComponent<ArrowToken>() && opponentOffset == targetOffset) {
 				controller.jump = true;
 			}
+
+			controller.fastFall = targetOffset.y < -1f;
 		}
 
 		/// <summary>
@@ -459,6 +484,18 @@ namespace Assets.Scripts.Player.AI
 				currentLedges = platformHit.collider.transform.parent.GetComponentsInChildren<LedgeNode>();
 			}
 			return currentLedges;
+		}
+
+		/// <summary>
+		/// Checks if two objects are on the same platform.
+		/// </summary>
+		/// <param name="position1">The position of the first object. </param>
+		/// <param name="position2">The position of the second object.</param>
+		private bool OnSamePlatform(Transform position1, Transform position2)
+		{
+			GameObject platform1 = GetPlatformUnderneath(position1);
+			GameObject platform2 = GetPlatformUnderneath(position2);
+			return platform1 != null && platform2 != null && platform1 == platform2;
 		}
 
 		/// <summary>

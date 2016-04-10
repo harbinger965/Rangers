@@ -9615,7 +9615,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adjacentEdges:
   - {fileID: 440713867}
-  index: 0
+  - {fileID: 1482486104}
+  - {fileID: 1482486103}
 --- !u!114 &440713867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9629,7 +9630,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adjacentEdges:
   - {fileID: 440713866}
-  index: 0
+  - {fileID: 1482486104}
+  - {fileID: 1482486103}
 --- !u!1 &444827677
 GameObject:
   m_ObjectHideFlags: 0
@@ -34129,7 +34131,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 431356, guid: 3a7ff25528a1345e98d54c3000d1edf3, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.72
+      value: 0.11
       objectReference: {fileID: 0}
     - target: {fileID: 431356, guid: 3a7ff25528a1345e98d54c3000d1edf3, type: 2}
       propertyPath: m_LocalPosition.z
@@ -34243,7 +34245,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adjacentEdges:
   - {fileID: 1482486104}
-  index: 0
+  - {fileID: 440713867}
+  - {fileID: 440713866}
 --- !u!114 &1482486104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34257,7 +34260,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adjacentEdges:
   - {fileID: 1482486103}
-  index: 0
+  - {fileID: 440713867}
+  - {fileID: 440713866}
 --- !u!1 &1482504440
 GameObject:
   m_ObjectHideFlags: 0
