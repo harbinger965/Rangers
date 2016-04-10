@@ -104,6 +104,7 @@ namespace Assets.Scripts.Player.AI
 			{
 				if (controller.ArcheryComponent.StrengthPercentage >= power && Mathf.Abs(Vector3.Angle(controller.aim, Vector3.right) - controller.ArcheryComponent.GetAimAngle()) < 7)
 				{
+					controller.ArcheryComponent.StrengthPercentage = power;
 					controller.aiming = false;
 				}
 			}

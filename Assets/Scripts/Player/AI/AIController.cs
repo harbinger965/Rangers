@@ -27,6 +27,10 @@ namespace Assets.Scripts.Player.AI
 		[SerializeField]
 		[Tooltip("Whether the ranger is sliding.")]
 		internal bool slide = false;
+		/// <summary> Whether the ranger is fast-falling. </summary>
+		[SerializeField]
+		[Tooltip("Whether the ranger is fast-falling.")]
+		internal bool fastFall = false;
 
 		/// <summary> Whether the ranger is grabbing a token. </summary>
 		[SerializeField]
@@ -159,7 +163,7 @@ namespace Assets.Scripts.Player.AI
 		/// <inheritdoc/>
 		internal override bool IsHoldingDown()
 		{
-			return false;
+			return fastFall;
 		}
 
 		/// <summary>

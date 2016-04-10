@@ -43,6 +43,9 @@ public class CameraFollow : MonoBehaviour
 					averagePosition += GameManager.instance.AllPlayers[i].transform.position + (Vector3.up*2f);
 				}
 			}
+			if (numPlayers == 0) {
+				return;
+			}
 
 			averagePosition /= numPlayers;
 			greatestDistance = 0;

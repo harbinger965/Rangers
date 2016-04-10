@@ -11,7 +11,7 @@ namespace Assets.Scripts.Player.AI
 	public class ApproachShoot : IPolicy
 	{
 		/// <summary> The distance that the AI wants to be from the target. </summary>
-		private const float TARGETDISTANCE = 5;
+		private const float TARGETDISTANCE = 4;
 
 		/// <summary> The policy the AI is using to approach an enemy. </summary>
 		private RushEnemy rushPolicy = new RushEnemy(TARGETDISTANCE);
