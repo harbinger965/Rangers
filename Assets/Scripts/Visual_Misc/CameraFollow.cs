@@ -23,7 +23,6 @@ public class CameraFollow : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		numPlayers = GameManager.instance.AllPlayers.Count;
 		startingPos = transform.position;
 		targetPos = startingPos;
 		if(transform.FindChild("BlurCam")) {
@@ -36,9 +35,16 @@ public class CameraFollow : MonoBehaviour
 	{
 		if(!GameManager.instance.GameFinished) {
 			Vector3 averagePosition = Vector3.zero;
-			for(int i = 0; i < numPlayers; i++) 
+			numPlayers = 0;
+			for(int i = 0; i < GameManager.instance.AllPlayers.Count; i++) 
 			{
-				averagePosition += GameManager.instance.AllPlayers[i].transform.position + (Vector3.up*2f);
+				if(GameManager.instance.AllPlayers[i].LifeComponent.HealthPercentage > 0) {
+					numPlayers++;
+					averagePosition += GameManager.instance.AllPlayers[i].transform.position + (Vector3.up*2f);
+				}
+			}
+			if (numPlayers == 0) {
+				return;
 			}
 
 			averagePosition /= numPlayers;
@@ -52,7 +58,7 @@ public class CameraFollow : MonoBehaviour
 					greatestDistance = tempDist;
 				}
 			}
-			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y, (-1.1f)*(greatestDistance+4)), Time.deltaTime*speed);
+			transform.position = Vector3.MoveTowards(transform.position, new Vector3(averagePosition.x, averagePosition.y, (-1.3f)*(greatestDistance+4)), Time.deltaTime*speed);
 			targetPos = transform.position;
 
 			if(blurCam) blurCam.fieldOfView = Mathf.MoveTowards(blurCam.fieldOfView,60f,Time.deltaTime*5f);

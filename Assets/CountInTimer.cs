@@ -14,7 +14,7 @@ public class CountInTimer : MonoBehaviour {
 		startingMagnitude = Camera.main.GetComponent<PerlinShake>().magnitude;
 		startingDuration = Camera.main.GetComponent<PerlinShake>().duration;
 		Camera.main.GetComponent<PerlinShake>().duration = startingTimeCountdown;
-		Camera.main.GetComponent<PerlinShake>().PlayShake();
+//		Camera.main.GetComponent<PerlinShake>().PlayShake();
 	}
 
 	// Update is called once per frame
@@ -22,8 +22,8 @@ public class CountInTimer : MonoBehaviour {
 		transform.GetChild(2).GetComponent<Text>().text = GameManager.instance.countInTimer.ToString("F3");
 		transform.GetChild(1).GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(500,19), new Vector2(-400,19), 1 - GameManager.instance.countInTimer/startingTimeCountdown);
 		transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(500,19), new Vector2(-400,19), 1 - GameManager.instance.countInTimer/startingTimeCountdown);
-		Camera.main.GetComponent<PerlinShake>().speed += Time.deltaTime*8f;
-		Camera.main.GetComponent<PerlinShake>().magnitude += Time.deltaTime/3f;
+//		Camera.main.GetComponent<PerlinShake>().speed += Time.deltaTime*8f;
+//		Camera.main.GetComponent<PerlinShake>().magnitude += Time.deltaTime/3f;
 
 		Camera.main.fieldOfView -= Time.deltaTime*4f;
 		Camera.main.transform.FindChild("BlurCamera").GetComponent<Camera>().fieldOfView -= Time.deltaTime*4f;
